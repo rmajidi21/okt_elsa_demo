@@ -22,6 +22,8 @@
     --dark:   #0f172a;
     --border: #1e3a5f;
     --panel:  #132038;
+    --ai:     #8b5cf6;
+    --ai2:    #a78bfa;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
@@ -34,8 +36,6 @@
     display: flex;
     flex-direction: column;
   }
-
-  /* ── Top bar ── */
   .topbar {
     background: var(--dark);
     border-bottom: 2px solid var(--teal);
@@ -44,6 +44,7 @@
     justify-content: space-between;
     padding: 8px 20px;
     flex-shrink: 0;
+    z-index: 10;
   }
   .logo { display:flex; align-items:center; gap:10px; }
   .logo-mark {
@@ -54,12 +55,13 @@
   }
   .logo-name { font-weight:700; font-size:16px; color:white; }
   .logo-sub  { font-size:10px; color:var(--teal2); }
-  .topbar-center { display:flex; gap:24px; }
+  .topbar-center { display:flex; gap:4px; }
   .nav-item {
-    padding:4px 12px; border-radius:4px; font-size:12px;
-    color:var(--mid); cursor:pointer; transition:.2s;
+    padding:5px 14px; border-radius:6px; font-size:12px;
+    color:var(--mid); cursor:pointer; transition:.2s; font-weight:500;
   }
-  .nav-item.active { background:var(--navy2); color:var(--teal2); font-weight:600; }
+  .nav-item:hover { background:#1a2a40; color:var(--white); }
+  .nav-item.active { background:var(--navy2); color:var(--teal2); font-weight:600; border-bottom:2px solid var(--teal); }
   .topbar-right { display:flex; align-items:center; gap:16px; }
   .live-badge {
     display:flex; align-items:center; gap:5px;
@@ -70,7 +72,7 @@
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
   .alert-btn {
     background:var(--red); border-radius:20px; padding:3px 12px;
-    font-size:11px; font-weight:700; animation:alertpulse 2s infinite;
+    font-size:11px; font-weight:700; animation:alertpulse 2s infinite; cursor:pointer;
   }
   @keyframes alertpulse { 0%,100%{opacity:1} 50%{opacity:.7} }
   .user-chip { display:flex;align-items:center;gap:6px;color:var(--mid);font-size:11px; }
@@ -79,18 +81,20 @@
     background:linear-gradient(135deg,var(--teal),#0369a1);
     display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;
   }
+  .main { display:flex; flex:1; overflow:hidden; }
 
-  /* ── Main layout ── */
-  .main { display:flex; flex:1; overflow:hidden; gap:0; }
+  /* ── TAB PANELS ── */
+  .tab-panel { display:none; flex:1; overflow:hidden; }
+  .tab-panel.active { display:flex; }
 
-  /* ── Sidebar ── */
+  /* ══════════════════════════════════
+     PATIENT MONITOR TAB
+  ══════════════════════════════════ */
   .sidebar {
     width:220px; background:var(--dark); border-right:1px solid var(--border);
-    display:flex; flex-direction:column; flex-shrink:0;
-    padding:12px 0;
+    display:flex; flex-direction:column; flex-shrink:0; padding:12px 0;
   }
-  .sidebar-section { padding:0 12px; margin-bottom:8px; }
-  .sidebar-label { font-size:9px; color:var(--mid); text-transform:uppercase; letter-spacing:.8px; margin-bottom:6px; padding-left:8px; }
+  .sidebar-label { font-size:9px; color:var(--mid); text-transform:uppercase; letter-spacing:.8px; margin-bottom:6px; padding-left:20px; }
   .patient-card {
     background:var(--panel); border:1px solid var(--border); border-radius:8px;
     padding:10px; margin:0 8px 12px;
@@ -110,11 +114,7 @@
   .s-date { font-size:10px; color:var(--mid); }
   .s-score { font-size:11px; font-weight:700; }
   .s-badge { font-size:9px; padding:1px 5px; border-radius:3px; font-weight:700; }
-
-  /* ── Center panel ── */
-  .center { flex:1; display:flex; flex-direction:column; gap:0; overflow:hidden; }
-
-  /* ── NRI hero ── */
+  .center { flex:1; display:flex; flex-direction:column; overflow:hidden; }
   .nri-hero {
     background: linear-gradient(135deg, var(--navy2) 0%, var(--navy3) 100%);
     border-bottom:1px solid var(--border);
@@ -141,18 +141,13 @@
   .nri-kpi { text-align:center; }
   .nri-kpi-v { font-size:18px; font-weight:800; color:var(--teal2); }
   .nri-kpi-l { font-size:9px; color:var(--mid); }
-
-  /* ── Sub-metrics ── */
   .submetrics {
     display:grid; grid-template-columns:repeat(4,1fr);
     gap:1px; background:var(--border);
     border-bottom:1px solid var(--border);
     flex-shrink:0;
   }
-  .metric-card {
-    background:var(--panel); padding:10px 14px;
-    display:flex; flex-direction:column; gap:4px;
-  }
+  .metric-card { background:var(--panel); padding:10px 14px; display:flex; flex-direction:column; gap:4px; }
   .metric-head { display:flex; justify-content:space-between; align-items:flex-start; }
   .metric-tag { font-size:9px; font-weight:700; color:var(--teal); letter-spacing:.5px; }
   .metric-val { font-size:20px; font-weight:900; line-height:1; }
@@ -160,8 +155,6 @@
   .metric-bar-bg { height:4px; background:#1e3a5f; border-radius:2px; overflow:hidden; }
   .metric-bar { height:4px; border-radius:2px; transition:width 1.5s ease; }
   .metric-change { font-size:9px; margin-top:3px; }
-
-  /* ── Bottom panels ── */
   .bottom-panels {
     flex:1; display:grid; grid-template-columns:1fr 1fr;
     gap:1px; background:var(--border); overflow:hidden;
@@ -178,21 +171,13 @@
   }
   .panel-tag { font-size:9px; color:var(--mid); text-transform:none; font-weight:400; letter-spacing:0; }
   .chart-wrap { flex:1; position:relative; min-height:0; }
-
-  /* ── Right panel ── */
   .right-panel {
     width:220px; background:var(--dark); border-left:1px solid var(--border);
-    display:flex; flex-direction:column; gap:0; flex-shrink:0;
-    overflow-y:auto;
+    display:flex; flex-direction:column; flex-shrink:0; overflow-y:auto;
   }
   .rp-section { padding:12px; border-bottom:1px solid var(--border); }
-  .rp-title {
-    font-size:9px; font-weight:700; color:var(--teal); letter-spacing:.6px;
-    text-transform:uppercase; margin-bottom:8px;
-  }
-  .rtd-badge {
-    border-radius:8px; padding:10px; text-align:center; margin-bottom:8px;
-  }
+  .rp-title { font-size:9px; font-weight:700; color:var(--teal); letter-spacing:.6px; text-transform:uppercase; margin-bottom:8px; }
+  .rtd-badge { border-radius:8px; padding:10px; text-align:center; margin-bottom:8px; }
   .rtd-score { font-size:24px; font-weight:900; }
   .rtd-label { font-size:10px; margin-top:2px; }
   .rtd-criteria { display:flex; flex-direction:column; gap:4px; }
@@ -205,36 +190,196 @@
   .imu-norm { font-size:9px; color:var(--mid); }
   .imu-bar-bg { height:3px; background:#1e3a5f; border-radius:2px; margin-top:4px; }
   .imu-bar { height:3px; border-radius:2px; transition:width 1.5s ease; }
-  .rtm-rows { display:flex; flex-direction:column; gap:4px; }
-  .rtm-row { display:flex; justify-content:space-between; align-items:center; font-size:10px; }
-  .rtm-code { color:var(--mid); }
-  .rtm-amt { font-weight:700; color:var(--green); }
-  .rtm-total { border-top:1px solid var(--border); padding-top:5px; margin-top:2px; }
-  .alert-card {
-    background:#2d0a0a; border:1px solid var(--red); border-radius:6px;
-    padding:8px; margin-bottom:6px;
-  }
+  .alert-card { background:#2d0a0a; border:1px solid var(--red); border-radius:6px; padding:8px; margin-bottom:6px; }
   .alert-title { font-size:10px; font-weight:700; color:var(--red); margin-bottom:3px; }
   .alert-text { font-size:9px; color:#fca5a5; line-height:1.4; }
-
-  /* ── EMG waveform ── */
-  #emgCanvas { width:100% !important; }
-
-  /* ── Animated counter ── */
-  .counter { display:inline-block; }
-
-  /* ── Timestamp ── */
   .timestamp { font-size:9px; color:var(--mid); }
 
-  /* ── Session trend sparkline ── */
-  .trend-row {
-    display:flex; gap:4px; align-items:flex-end;
-    height:32px; margin:4px 0;
+  /* ══════════════════════════════════
+     SESSION HISTORY TAB
+  ══════════════════════════════════ */
+  .hist-tab {
+    flex:1; display:flex; flex-direction:column; overflow:hidden; padding:20px; gap:16px;
   }
-  .trend-bar {
-    flex:1; border-radius:2px 2px 0 0; min-width:0;
-    transition:height 1s ease;
+  .hist-header { display:flex; justify-content:space-between; align-items:center; flex-shrink:0; }
+  .hist-title { font-size:18px; font-weight:800; }
+  .hist-sub { font-size:11px; color:var(--mid); }
+  .hist-filters { display:flex; gap:8px; }
+  .filter-btn {
+    padding:4px 12px; border-radius:20px; font-size:11px; cursor:pointer;
+    background:var(--navy2); color:var(--mid); border:1px solid var(--border);
+    transition:.2s;
   }
+  .filter-btn.on { background:#0c4a6e; color:var(--teal2); border-color:var(--teal); }
+  .hist-body { display:grid; grid-template-columns:1fr 1fr; gap:16px; flex:1; overflow:hidden; }
+  .hist-left { display:flex; flex-direction:column; gap:12px; overflow-y:auto; }
+  .hist-right { display:flex; flex-direction:column; gap:12px; overflow:hidden; }
+  .hist-card { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px; }
+  .hist-card-title { font-size:10px; font-weight:700; color:var(--teal2); text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; }
+  .session-row {
+    display:grid; grid-template-columns:80px 60px 55px 55px 55px 55px 55px 80px;
+    gap:6px; align-items:center; padding:7px 8px; border-radius:6px;
+    font-size:11px; border-bottom:1px solid #1a2a40;
+  }
+  .session-row:last-child { border-bottom:none; }
+  .session-row.header { background:var(--navy2); font-size:9px; color:var(--mid); font-weight:700; text-transform:uppercase; border-bottom:none; margin-bottom:2px; }
+  .session-row:not(.header):hover { background:#1a2a40; }
+  .prog-bar-sm { height:4px; border-radius:2px; background:var(--navy2); margin-top:2px; overflow:hidden; }
+  .prog-fill { height:4px; border-radius:2px; }
+  .note-box { background:var(--navy2); border-radius:6px; padding:8px; margin-top:8px; font-size:10px; color:var(--mid); line-height:1.5; }
+  .note-box span { color:var(--teal2); font-weight:600; }
+  .chart-card { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px; flex:1; min-height:0; display:flex; flex-direction:column; }
+  .chart-card-title { font-size:10px; font-weight:700; color:var(--teal2); text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; flex-shrink:0; }
+  .chart-inner { flex:1; position:relative; min-height:0; }
+
+  /* ══════════════════════════════════
+     POPULATION TAB
+  ══════════════════════════════════ */
+  .pop-tab {
+    flex:1; display:flex; flex-direction:column; overflow:hidden; padding:20px; gap:16px;
+    background: var(--navy);
+  }
+  .pop-header { display:flex; justify-content:space-between; align-items:center; flex-shrink:0; }
+  .stat-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; flex-shrink:0; }
+  .stat-tile {
+    background:var(--panel); border:1px solid var(--border); border-radius:10px;
+    padding:12px; text-align:center;
+  }
+  .stat-v { font-size:26px; font-weight:900; color:var(--teal2); }
+  .stat-l { font-size:9px; color:var(--mid); text-transform:uppercase; letter-spacing:.5px; margin-top:3px; }
+  .stat-chg { font-size:10px; margin-top:4px; font-weight:700; }
+  .pop-body { display:grid; grid-template-columns:1fr 1fr; gap:16px; flex:1; overflow:hidden; }
+  .pop-card { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px; display:flex; flex-direction:column; overflow:hidden; }
+  .pop-card-title { font-size:10px; font-weight:700; color:var(--teal2); text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; flex-shrink:0; display:flex; justify-content:space-between; align-items:center; }
+  .pop-chart-wrap { flex:1; position:relative; min-height:0; }
+  .pt-list { display:flex; flex-direction:column; gap:4px; overflow-y:auto; flex:1; }
+  .pt-row {
+    display:grid; grid-template-columns:110px 40px 1fr 65px 70px;
+    gap:8px; align-items:center; padding:6px 8px; border-radius:6px;
+    font-size:10px; transition:.15s;
+  }
+  .pt-row:hover { background:var(--navy2); }
+  .pt-row.hdr { font-size:9px; color:var(--mid); font-weight:700; text-transform:uppercase; background:var(--navy2); }
+  .mini-bar-bg { height:5px; background:#1e3a5f; border-radius:3px; overflow:hidden; }
+  .mini-bar { height:5px; border-radius:3px; }
+
+  /* ══════════════════════════════════
+     RTM BILLING TAB
+  ══════════════════════════════════ */
+  .billing-tab {
+    flex:1; display:flex; flex-direction:column; overflow:hidden; padding:20px; gap:16px;
+    background: var(--navy);
+  }
+  .billing-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; flex-shrink:0; }
+  .billing-body { display:grid; grid-template-columns:1.3fr 1fr; gap:16px; flex:1; overflow:hidden; }
+  .billing-card { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px; display:flex; flex-direction:column; overflow:hidden; }
+  .billing-card-title { font-size:11px; font-weight:700; color:var(--teal2); text-transform:uppercase; letter-spacing:.5px; margin-bottom:12px; flex-shrink:0; display:flex; justify-content:space-between; align-items:center; }
+  .billing-table { width:100%; border-collapse:collapse; font-size:11px; }
+  .billing-table th { font-size:9px; color:var(--mid); text-transform:uppercase; font-weight:700; padding:6px 8px; text-align:left; border-bottom:1px solid var(--border); }
+  .billing-table td { padding:7px 8px; border-bottom:1px solid #1a2a40; }
+  .billing-table tr:last-child td { border-bottom:none; }
+  .billing-table tr:hover td { background:#1a2a40; }
+  .status-tag { padding:2px 8px; border-radius:10px; font-size:9px; font-weight:700; }
+  .tag-paid { background:#052e16; color:var(--green); }
+  .tag-pending { background:#451a03; color:var(--amber); }
+  .tag-review { background:#172554; color:var(--teal2); }
+  .billing-summary { display:flex; flex-direction:column; gap:8px; }
+  .billing-row { display:flex; justify-content:space-between; align-items:center; font-size:11px; padding:6px 0; border-bottom:1px solid #1a2a40; }
+  .billing-row:last-child { border-bottom:none; }
+  .billing-row.total { font-weight:700; font-size:13px; padding-top:8px; border-top:2px solid var(--border); border-bottom:none; }
+  .code-chip { font-size:9px; background:var(--navy2); padding:1px 6px; border-radius:4px; color:var(--teal2); font-family:monospace; }
+  .billing-chart-wrap { flex:1; position:relative; min-height:0; }
+
+  /* ══════════════════════════════════
+     REPORTS TAB
+  ══════════════════════════════════ */
+  .reports-tab {
+    flex:1; display:flex; overflow:hidden; background:var(--navy);
+  }
+  .reports-sidebar {
+    width:240px; background:var(--dark); border-right:1px solid var(--border);
+    display:flex; flex-direction:column; padding:16px; gap:8px; overflow-y:auto; flex-shrink:0;
+  }
+  .reports-sidebar-title { font-size:10px; color:var(--mid); text-transform:uppercase; letter-spacing:.7px; font-weight:700; margin-bottom:4px; }
+  .report-type-btn {
+    padding:9px 12px; border-radius:8px; font-size:11px;
+    cursor:pointer; border:1px solid var(--border); transition:.15s;
+    background:transparent; color:var(--mid);
+  }
+  .report-type-btn:hover { background:var(--navy2); color:var(--white); }
+  .report-type-btn.active { background:linear-gradient(135deg,#2e1065,#4c1d95); color:var(--ai2); border-color:var(--ai); }
+  .report-type-btn .rb-icon { font-size:14px; margin-bottom:3px; }
+  .report-type-btn .rb-title { font-weight:700; display:block; }
+  .report-type-btn .rb-sub { font-size:9px; display:block; margin-top:1px; opacity:.7; }
+  .ai-badge {
+    display:flex; align-items:center; gap:6px; padding:8px 10px;
+    background:linear-gradient(135deg,#1e0f40,#2d1b69);
+    border:1px solid var(--ai); border-radius:8px; margin-top:8px;
+    font-size:10px; color:var(--ai2);
+  }
+  .ai-dot { width:6px;height:6px;border-radius:50%;background:var(--ai);animation:pulse 1.5s infinite; }
+  .reports-main {
+    flex:1; display:flex; flex-direction:column; overflow:hidden; padding:20px; gap:12px;
+  }
+  .report-header { display:flex; justify-content:space-between; align-items:flex-start; flex-shrink:0; }
+  .report-meta { font-size:10px; color:var(--mid); line-height:1.7; }
+  .report-meta span { color:var(--teal2); }
+  .gen-btn {
+    padding:8px 18px; background:linear-gradient(135deg,var(--ai),#6d28d9);
+    border-radius:8px; font-size:12px; font-weight:700; cursor:pointer;
+    border:none; color:white; display:flex; align-items:center; gap:8px;
+    transition:.2s; white-space:nowrap;
+  }
+  .gen-btn:hover { opacity:.9; transform:translateY(-1px); }
+  .gen-btn:disabled { opacity:.5; cursor:default; transform:none; }
+  .report-body {
+    flex:1; background:var(--panel); border:1px solid var(--border);
+    border-radius:12px; padding:20px; overflow-y:auto;
+    font-size:12px; line-height:1.7;
+  }
+  .report-section { margin-bottom:20px; }
+  .report-section-title {
+    font-size:13px; font-weight:800; color:var(--teal2);
+    margin-bottom:8px; padding-bottom:4px;
+    border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:8px;
+  }
+  .conf-badge {
+    font-size:9px; font-weight:700; padding:2px 6px; border-radius:10px;
+    background:#052e16; color:var(--green); margin-left:auto;
+  }
+  .report-text { color:#cbd5e1; line-height:1.75; }
+  .report-highlight { color:var(--teal2); font-weight:700; }
+  .report-warn { color:var(--amber); font-weight:700; }
+  .report-ok { color:var(--green); font-weight:700; }
+  .cursor { display:inline-block; width:2px; height:13px; background:var(--teal2); animation:blink .7s infinite; vertical-align:middle; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .generating-overlay {
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    height:100%; gap:16px;
+  }
+  .ai-spinner {
+    width:48px; height:48px; border-radius:50%;
+    border:3px solid #2d1b69; border-top:3px solid var(--ai);
+    animation:spin 1s linear infinite;
+  }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .gen-label { font-size:13px; color:var(--ai2); font-weight:600; }
+  .gen-steps { display:flex; flex-direction:column; gap:6px; max-width:300px; }
+  .gen-step { font-size:10px; color:var(--mid); display:flex; align-items:center; gap:8px; }
+  .gen-step.done { color:var(--green); }
+  .gen-step.active { color:var(--ai2); }
+  .gen-step-dot { width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0; }
+  .rec-table { width:100%; border-collapse:collapse; margin-top:8px; }
+  .rec-table td { padding:6px 10px; border:1px solid var(--border); font-size:11px; }
+  .rec-table tr:first-child td { background:var(--navy2); font-weight:700; font-size:10px; color:var(--teal2); }
+  .ai-footer {
+    flex-shrink:0; padding:8px 12px;
+    background:#0a0a1a; border:1px solid #2d1b69; border-radius:8px;
+    display:flex; align-items:center; justify-content:space-between;
+    font-size:9px; color:var(--mid);
+  }
+  .ai-footer span { color:var(--ai2); }
 </style>
 </head>
 <body>
@@ -249,11 +394,11 @@
     </div>
   </div>
   <div class="topbar-center">
-    <div class="nav-item active">Patient Monitor</div>
-    <div class="nav-item">Session History</div>
-    <div class="nav-item">Population</div>
-    <div class="nav-item">RTM Billing</div>
-    <div class="nav-item">Reports</div>
+    <div class="nav-item active" onclick="switchTab('monitor',this)">Patient Monitor</div>
+    <div class="nav-item" onclick="switchTab('history',this)">Session History</div>
+    <div class="nav-item" onclick="switchTab('population',this)">Population</div>
+    <div class="nav-item" onclick="switchTab('billing',this)">RTM Billing</div>
+    <div class="nav-item" onclick="switchTab('reports',this)">Reports</div>
   </div>
   <div class="topbar-right">
     <div class="live-badge"><div class="live-dot"></div>LIVE SESSION</div>
@@ -265,6 +410,9 @@
 
 <div class="main">
 
+<!-- ══════════════ PATIENT MONITOR ══════════════ -->
+<div class="tab-panel active" id="tab-monitor" style="flex:1;overflow:hidden;">
+  <div style="display:flex;flex:1;overflow:hidden;">
   <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="patient-card">
@@ -283,8 +431,6 @@
 
   <!-- CENTER -->
   <div class="center">
-
-    <!-- NRI HERO -->
     <div class="nri-hero">
       <div class="nri-gauge-wrap">
         <canvas id="nriGauge" width="130" height="80"></canvas>
@@ -304,393 +450,669 @@
         <div class="nri-kpi"><div class="nri-kpi-v" style="color:var(--green)">+11</div><div class="nri-kpi-l">vs Last Session</div></div>
       </div>
     </div>
-
-    <!-- SUB-METRICS -->
-    <div class="submetrics" id="submetrics">
-      <!-- rendered by JS -->
-    </div>
-
-    <!-- BOTTOM PANELS -->
+    <div class="submetrics" id="submetrics"></div>
     <div class="bottom-panels">
       <div class="panel">
-        <div class="panel-title">
-          EMG — Raw Neuromuscular Signal
-          <span class="panel-tag">sEMG · 4-channel · 2kHz · Bluetooth LE</span>
-        </div>
-        <div class="chart-wrap">
-          <canvas id="emgCanvas"></canvas>
-        </div>
+        <div class="panel-title">EMG — Raw Neuromuscular Signal<span class="panel-tag">sEMG · 4-channel · 2kHz · BLE</span></div>
+        <div class="chart-wrap"><canvas id="emgCanvas"></canvas></div>
       </div>
       <div class="panel">
-        <div class="panel-title">
-          ELSA-NRI · Session Trajectory
-          <span class="panel-tag">Sessions 1–4 · Target ≥ 85</span>
-        </div>
-        <div class="chart-wrap">
-          <canvas id="trendChart"></canvas>
-        </div>
+        <div class="panel-title">ELSA-NRI · Session Trajectory<span class="panel-tag">Sessions 1–4 · Target ≥ 85</span></div>
+        <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
       </div>
     </div>
   </div>
 
-  <!-- RIGHT PANEL -->
+  <!-- RIGHT PANEL — billing REMOVED -->
   <div class="right-panel">
-
-    <!-- RTD -->
     <div class="rp-section">
       <div class="rp-title">RTD / RTP Decision Support</div>
-      <div class="rtd-badge" style="background:#172554;border:1px solid var(--amber)" id="rtdBadge">
+      <div class="rtd-badge" style="background:#172554;border:1px solid var(--amber)">
         <div class="rtd-score" style="color:var(--amber)">NOT CLEARED</div>
         <div class="rtd-label" style="color:var(--mid)">Threshold: NRI ≥ 85</div>
       </div>
       <div class="rtd-criteria" id="rtdCriteria"></div>
     </div>
-
-    <!-- ALERT -->
     <div class="rp-section">
       <div class="rp-title">Active Alerts</div>
       <div class="alert-card">
         <div class="alert-title">⚠ SRD Elevation</div>
-        <div class="alert-text">Synergy Recruitment Deviation 22% above baseline. Compensatory recruitment pattern detected in infraspinatus. Review exercise load.</div>
+        <div class="alert-text">Synergy Recruitment Deviation 22% above baseline. Compensatory recruitment in infraspinatus. Review exercise load.</div>
       </div>
     </div>
-
-    <!-- IMU ROM -->
     <div class="rp-section">
       <div class="rp-title">IMU · Range of Motion</div>
       <div class="imu-grid" id="imuGrid"></div>
     </div>
-
-    <!-- RTM BILLING -->
-    <div class="rp-section">
-      <div class="rp-title">RTM Billing — This Session</div>
-      <div class="rtm-rows">
-        <div class="rtm-row"><span class="rtm-code">98975 — Setup</span><span class="rtm-amt">$19</span></div>
-        <div class="rtm-row"><span class="rtm-code">98977 — Monitoring</span><span class="rtm-amt">$52</span></div>
-        <div class="rtm-row"><span class="rtm-code">98980 — Interaction</span><span class="rtm-amt">$50</span></div>
-        <div class="rtm-row rtm-total"><span style="font-weight:700">Session Revenue</span><span class="rtm-amt">$121</span></div>
-        <div class="rtm-row" style="font-size:9px;color:var(--mid)"><span>OKT Platform Fee</span><span style="color:var(--mid)">($36)</span></div>
-        <div class="rtm-row" style="font-size:9px;"><span style="color:var(--mid)">Net to Clinic</span><span style="color:var(--green);font-weight:700">$85</span></div>
-      </div>
-    </div>
-
-    <!-- DEVICE STATUS -->
     <div class="rp-section">
       <div class="rp-title">ELSA Device Status</div>
       <div style="display:flex;flex-direction:column;gap:4px">
-        <div class="rtm-row"><span style="color:var(--mid)">Connection</span><span style="color:var(--green);font-size:10px">● BLE Active</span></div>
-        <div class="rtm-row"><span style="color:var(--mid)">Signal Quality</span><span style="color:var(--green);font-size:10px">● 96%</span></div>
-        <div class="rtm-row"><span style="color:var(--mid)">Battery</span><span style="color:var(--teal2);font-size:10px">82%</span></div>
-        <div class="rtm-row"><span style="color:var(--mid)">Firmware</span><span style="color:var(--mid);font-size:10px">v2.4.1</span></div>
-        <div class="rtm-row"><span style="color:var(--mid)">Data Rate</span><span style="color:var(--teal2);font-size:10px">2 kHz · 4ch</span></div>
+        <div class="rtd-row"><span style="color:var(--mid)">Connection</span><span style="color:var(--green);font-size:10px">● BLE Active</span></div>
+        <div class="rtd-row"><span style="color:var(--mid)">Signal Quality</span><span style="color:var(--green);font-size:10px">● 96%</span></div>
+        <div class="rtd-row"><span style="color:var(--mid)">Battery</span><span style="color:var(--teal2);font-size:10px">82%</span></div>
+        <div class="rtd-row"><span style="color:var(--mid)">Firmware</span><span style="color:var(--mid);font-size:10px">v2.4.1</span></div>
+        <div class="rtd-row"><span style="color:var(--mid)">Data Rate</span><span style="color:var(--teal2);font-size:10px">2 kHz · 4ch</span></div>
       </div>
     </div>
   </div>
-
+  </div>
 </div>
 
+<!-- ══════════════ SESSION HISTORY ══════════════ -->
+<div class="tab-panel" id="tab-history" style="flex:1;overflow:hidden;">
+  <div class="hist-tab">
+    <div class="hist-header">
+      <div>
+        <div class="hist-title">Session History — M. Rodriguez</div>
+        <div class="hist-sub">Rotator Cuff Repair (R) · Jun 3, 2026 · Apex Orthopedic Rehab</div>
+      </div>
+      <div class="hist-filters">
+        <div class="filter-btn on">All Sessions</div>
+        <div class="filter-btn">Sub-Metrics</div>
+        <div class="filter-btn">ROM</div>
+        <div class="filter-btn">Export CSV</div>
+      </div>
+    </div>
+    <div class="hist-body">
+      <div class="hist-left">
+        <div class="hist-card">
+          <div class="hist-card-title">Session Summary Table</div>
+          <div class="session-row header">
+            <span>Date</span><span>Week</span><span>NRI</span><span>SRD</span><span>JPS</span><span>BAI</span><span>FDI</span><span>Status</span>
+          </div>
+          <div id="histTable"></div>
+        </div>
+        <div class="hist-card">
+          <div class="hist-card-title">Clinician Notes</div>
+          <div id="histNotes"></div>
+        </div>
+      </div>
+      <div class="hist-right">
+        <div class="chart-card">
+          <div class="chart-card-title">NRI Progression — All Sessions</div>
+          <div class="chart-inner"><canvas id="histNriChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-title">Sub-Metric Radar — Session 4 vs Session 1</div>
+          <div class="chart-inner"><canvas id="histRadarChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ POPULATION ══════════════ -->
+<div class="tab-panel" id="tab-population" style="flex:1;overflow:hidden;">
+  <div class="pop-tab">
+    <div class="pop-header">
+      <div>
+        <div style="font-size:18px;font-weight:800;">Population Analytics — Apex Orthopedic Rehab</div>
+        <div style="font-size:11px;color:var(--mid);margin-top:2px;">Shoulder Instability Cohort · Aug 2026 · 24 active patients</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div class="filter-btn on">All Diagnoses</div>
+        <div class="filter-btn">RCR Only</div>
+        <div class="filter-btn">Bankart</div>
+        <div class="filter-btn">Latarjet</div>
+      </div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-tile"><div class="stat-v">24</div><div class="stat-l">Active Patients</div><div class="stat-chg" style="color:var(--green)">+3 this month</div></div>
+      <div class="stat-tile"><div class="stat-v" style="color:var(--green)">71%</div><div class="stat-l">Clearance Rate</div><div class="stat-chg" style="color:var(--green)">↑ vs 58% last qtr</div></div>
+      <div class="stat-tile"><div class="stat-v" style="color:var(--teal2)">63</div><div class="stat-l">Avg NRI at W10</div><div class="stat-chg" style="color:var(--mid)">Target ≥ 85</div></div>
+      <div class="stat-tile"><div class="stat-v" style="color:var(--amber)">14.2W</div><div class="stat-l">Avg Weeks to Clear</div><div class="stat-chg" style="color:var(--green)">↓ 2.1W vs baseline</div></div>
+      <div class="stat-tile"><div class="stat-v" style="color:var(--red)">8%</div><div class="stat-l">Re-Injury Rate</div><div class="stat-chg" style="color:var(--green)">↓ from 31% (pre-ELSA)</div></div>
+    </div>
+    <div class="pop-body">
+      <div class="pop-card">
+        <div class="pop-card-title">NRI Distribution by Week Post-Op <span style="font-size:9px;color:var(--mid);font-weight:400">n=24 patients</span></div>
+        <div class="pop-chart-wrap"><canvas id="popDistChart"></canvas></div>
+      </div>
+      <div class="pop-card">
+        <div class="pop-card-title">Active Patient Roster <span style="font-size:9px;color:var(--mid);font-weight:400">sorted by NRI</span></div>
+        <div class="pt-list">
+          <div class="pt-row hdr"><span>Patient</span><span>NRI</span><span>Progress</span><span>Week PO</span><span>Status</span></div>
+          <div id="ptRoster"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ RTM BILLING ══════════════ -->
+<div class="tab-panel" id="tab-billing" style="flex:1;overflow:hidden;">
+  <div class="billing-tab">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+      <div>
+        <div style="font-size:18px;font-weight:800;">RTM Billing Dashboard</div>
+        <div style="font-size:11px;color:var(--mid);margin-top:2px;">Apex Orthopedic Rehab · August 2026</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div class="filter-btn on">August 2026</div>
+        <div class="filter-btn">YTD</div>
+        <div class="filter-btn">Export Claims</div>
+      </div>
+    </div>
+    <div class="billing-grid">
+      <div class="stat-tile"><div class="stat-v" style="color:var(--green)">$4,356</div><div class="stat-l">August Revenue</div><div class="stat-chg" style="color:var(--green)">↑ 18% vs July</div></div>
+      <div class="stat-tile"><div class="stat-v" style="color:var(--teal2)">36</div><div class="stat-l">Sessions Billed</div><div class="stat-chg" style="color:var(--mid)">3 pending</div></div>
+      <div class="stat-tile"><div class="stat-v" style="color:var(--amber)">$3,128</div><div class="stat-l">Net to Clinic</div><div class="stat-chg" style="color:var(--mid)">After OKT fee</div></div>
+      <div class="stat-tile"><div class="stat-v" style="color:var(--mid)">$382</div><div class="stat-l">Outstanding</div><div class="stat-chg" style="color:var(--amber)">2 claims in review</div></div>
+    </div>
+    <div class="billing-body">
+      <div class="billing-card">
+        <div class="billing-card-title">Session Billing Log — August 2026 <span style="font-size:9px;color:var(--mid);font-weight:400">36 sessions</span></div>
+        <div style="overflow-y:auto;flex:1;">
+          <table class="billing-table">
+            <thead><tr>
+              <th>Date</th><th>Patient</th><th>98975</th><th>98977</th><th>98980</th><th>Gross</th><th>OKT Fee</th><th>Net</th><th>Status</th>
+            </tr></thead>
+            <tbody id="billingLog"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="billing-card">
+        <div class="billing-card-title">CPT Code Revenue Breakdown</div>
+        <div class="billing-chart-wrap"><canvas id="billingChart"></canvas></div>
+        <div style="margin-top:12px;">
+          <div class="billing-card-title" style="margin-top:4px;">This Session — M. Rodriguez</div>
+          <div class="billing-summary">
+            <div class="billing-row"><span><span class="code-chip">98975</span> Device Setup</span><span style="color:var(--green);font-weight:700">$19</span></div>
+            <div class="billing-row"><span><span class="code-chip">98977</span> Remote Monitoring</span><span style="color:var(--green);font-weight:700">$52</span></div>
+            <div class="billing-row"><span><span class="code-chip">98980</span> Clinical Interaction</span><span style="color:var(--green);font-weight:700">$50</span></div>
+            <div class="billing-row total"><span>Session Gross Revenue</span><span style="color:var(--green)">$121</span></div>
+            <div class="billing-row"><span style="color:var(--mid)">OKT Platform Fee</span><span style="color:var(--mid)">($36)</span></div>
+            <div class="billing-row"><span style="color:var(--teal2);font-weight:700">Net to Clinic</span><span style="color:var(--green);font-weight:800;font-size:15px">$85</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ REPORTS ══════════════ -->
+<div class="tab-panel" id="tab-reports" style="flex:1;overflow:hidden;">
+  <div class="reports-tab">
+    <div class="reports-sidebar">
+      <div class="reports-sidebar-title">Report Type</div>
+      <div class="report-type-btn active" onclick="selectReport('clinical',this)">
+        <div class="rb-icon">🩺</div>
+        <span class="rb-title">Clinical Progress</span>
+        <span class="rb-sub">Full session analysis + recommendations</span>
+      </div>
+      <div class="report-type-btn" onclick="selectReport('rtd',this)">
+        <div class="rb-icon">✅</div>
+        <span class="rb-title">RTD/RTP Clearance</span>
+        <span class="rb-sub">Readiness determination memo</span>
+      </div>
+      <div class="report-type-btn" onclick="selectReport('progress',this)">
+        <div class="rb-icon">📈</div>
+        <span class="rb-title">Progress Letter</span>
+        <span class="rb-sub">Patient-facing summary</span>
+      </div>
+      <div class="report-type-btn" onclick="selectReport('billing_report',this)">
+        <div class="rb-icon">💳</div>
+        <span class="rb-title">Billing Summary</span>
+        <span class="rb-sub">Monthly RTM documentation</span>
+      </div>
+      <div class="report-type-btn" onclick="selectReport('surgeon',this)">
+        <div class="rb-icon">🔬</div>
+        <span class="rb-title">Surgeon Communication</span>
+        <span class="rb-sub">Referral update letter</span>
+      </div>
+      <div class="ai-badge">
+        <div class="ai-dot"></div>
+        <div>
+          <div style="font-weight:700;font-size:10px;">ELSA Clinical AI</div>
+          <div style="font-size:9px;opacity:.8;">Fine-tuned · 12,847 cases</div>
+        </div>
+      </div>
+    </div>
+    <div class="reports-main">
+      <div class="report-header">
+        <div class="report-meta">
+          Patient: <span>M. Rodriguez</span> · Session: <span>4 of series</span> · Date: <span>Aug 5, 2026</span><br>
+          Clinician: <span>Dr. John Kia, PT</span> · Facility: <span>Apex Orthopedic Rehab</span> · Referring Surgeon: <span>Dr. K. Patel</span>
+        </div>
+        <button class="gen-btn" id="genBtn" onclick="generateReport()">✦ Generate AI Report</button>
+      </div>
+      <div class="report-body" id="reportBody">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--mid);">
+          <div style="font-size:40px;">✦</div>
+          <div style="font-size:14px;font-weight:600;">Select a report type and click Generate</div>
+          <div style="font-size:11px;text-align:center;max-width:300px;line-height:1.6;">ELSA Clinical AI will synthesize all session data into a structured clinical document in seconds.</div>
+        </div>
+      </div>
+      <div class="ai-footer" id="aiFooter" style="display:none;">
+        <div>Generated by <span>ELSA Clinical AI v2.1</span> · Fine-tuned on 12,847 shoulder rehabilitation cases · <span>GPT-4o base</span></div>
+        <div>⚠ AI-generated. Clinical review required before use. <span id="genTime"></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end .main -->
+
 <script>
+// ══ Tab switching ══
+function switchTab(id, el) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+  if (id==='history') initHistory();
+  if (id==='population') initPopulation();
+  if (id==='billing') initBilling();
+}
+
 // ══ Clock ══
 function updateClock() {
-  const now = new Date();
-  document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 }
-setInterval(updateClock, 1000); updateClock();
+setInterval(updateClock,1000); updateClock();
 
-// ══ Session data ══
+// ══════════════════════════════
+// PATIENT MONITOR DATA
+// ══════════════════════════════
 const sessions = [
-  { date:'Jun 24, 2026', week:'W3', nri:34, color:'var(--red)',    label:'HIGH RISK',          srd:62, jps:58, ai:55, fdi:60 },
-  { date:'Jul 8, 2026',  week:'W5', nri:51, color:'var(--red)',    label:'ELEVATED RISK',       srd:74, jps:64, ai:68, fdi:70 },
-  { date:'Jul 22, 2026', week:'W7', nri:67, color:'var(--amber)',  label:'MONITOR',             srd:82, jps:73, ai:77, fdi:75 },
-  { date:'Aug 5, 2026',  week:'W10',nri:78, color:'var(--amber)',  label:'APPROACHING READY',   srd:74, jps:84, ai:85, fdi:82 },
+  { date:'Jun 24, 2026', week:'W3',  nri:34, label:'HIGH RISK',        srd:62, jps:58, ai:55, fdi:60,
+    notes:'Initial post-op assessment. Significant guarding observed. Patient reports pain 6/10 at end range. Limited to passive ROM only. Infraspinatus activation markedly reduced vs. contralateral.' },
+  { date:'Jul 8, 2026',  week:'W5',  nri:51, label:'ELEVATED RISK',    srd:74, jps:64, ai:68, fdi:70,
+    notes:'Active-assisted ROM introduced. Pain 4/10. SRD improving but still elevated. Proprioceptive training initiated with mirror feedback. Patient tolerating resistance band at 25% intensity.' },
+  { date:'Jul 22, 2026', week:'W7',  nri:67, label:'MONITOR',          srd:82, jps:73, ai:77, fdi:75,
+    notes:'Good tolerance to active ROM. Pain 2/10 with overhead activity. IR lag resolved. Progressed to isotonic rotator cuff strengthening. BAI improving — asymmetry narrowing to 23% from 45% at W3.' },
+  { date:'Aug 5, 2026',  week:'W10', nri:78, label:'APPROACHING READY',srd:74, jps:84, ai:85, fdi:82,
+    notes:'Excellent JPS recovery. FDI within normal range. SRD remains elevated — compensatory infraspinatus recruitment flagged. Recommend reducing overhead pressing volume and adding targeted infraspinatus isolation work. Re-assess in 2 weeks.' },
 ];
 let currentSession = 3;
 
-// ══ Render session list ══
 function renderSessionList() {
-  const el = document.getElementById('sessionList');
-  el.innerHTML = sessions.map((s,i) => {
-    const score = s.nri;
-    const col = score >= 85 ? 'var(--green)' : score >= 65 ? 'var(--amber)' : 'var(--red)';
-    const bgCol = score >= 85 ? '#14532d' : score >= 65 ? '#451a03' : '#450a0a';
+  document.getElementById('sessionList').innerHTML = sessions.map((s,i) => {
+    const col = s.nri>=85?'var(--green)':s.nri>=65?'var(--amber)':'var(--red)';
+    const bg  = s.nri>=85?'#14532d':s.nri>=65?'#451a03':'#450a0a';
     return `<div class="session-item ${i===currentSession?'active':''}" onclick="switchSession(${i})">
       <div class="s-dot" style="background:${col}"></div>
       <div class="s-info">
         <div class="s-date">${s.date} · ${s.week}</div>
-        <div class="s-score" style="color:${col}">NRI: ${score} <span class="s-badge" style="background:${bgCol};color:${col}">${s.label}</span></div>
-      </div>
-    </div>`;
+        <div class="s-score" style="color:${col}">NRI: ${s.nri} <span class="s-badge" style="background:${bg};color:${col}">${s.label}</span></div>
+      </div></div>`;
   }).join('');
 }
 renderSessionList();
 
-// ══ Sub-metrics data ══
 const metrics = [
-  { tag:'SRD', name:'Synergy Recruitment\nDeviation', desc:'Departure from coordinated muscle synergy patterns', unit:'%', invert:true },
-  { tag:'JPS', name:'Joint Position Sense\nError Index', desc:'Proprioceptive accuracy during active shoulder repositioning', unit:'°', invert:true },
-  { tag:'AI',  name:'Bilateral Asymmetry\nIndex', desc:'Limb symmetry of neuromuscular activation — operative vs. contralateral', unit:'%', invert:true },
-  { tag:'FDI', name:'Fatigue Deviation\nIndex', desc:'Spectral & amplitude EMG changes under repeated-effort protocol', unit:'', invert:true },
+  { tag:'SRD', name:'Synergy Recruitment<br>Deviation', desc:'Departure from coordinated muscle synergy patterns' },
+  { tag:'JPS', name:'Joint Position Sense<br>Error Index', desc:'Proprioceptive accuracy during active shoulder repositioning' },
+  { tag:'BAI', name:'Bilateral Asymmetry<br>Index', desc:'Limb symmetry of neuromuscular activation' },
+  { tag:'FDI', name:'Fatigue Deviation<br>Index', desc:'Spectral & amplitude EMG changes under repeated effort' },
 ];
 
-function getMetricColor(val) {
-  if (val >= 80) return 'var(--green)';
-  if (val >= 65) return 'var(--amber)';
-  return 'var(--red)';
-}
+function getCol(v) { return v>=80?'var(--green)':v>=65?'var(--amber)':'var(--red)'; }
 
 function renderSubmetrics(s) {
-  const vals = [s.srd, s.jps, s.ai, s.fdi];
-  const prev = sessions[Math.max(0, currentSession-1)];
-  const prevVals = [prev.srd, prev.jps, prev.ai, prev.fdi];
-  const el = document.getElementById('submetrics');
-  el.innerHTML = metrics.map((m,i) => {
-    const v = vals[i]; const pv = prevVals[i];
-    const diff = v - pv; const col = getMetricColor(v);
-    const barPct = v + '%';
-    const changeStr = diff >= 0 ? `▲ +${diff}` : `▼ ${diff}`;
-    const changeCol = diff >= 0 ? 'var(--green)' : 'var(--red)';
+  const vals=[s.srd,s.jps,s.ai,s.fdi];
+  const prev=sessions[Math.max(0,currentSession-1)];
+  const pv=[prev.srd,prev.jps,prev.ai,prev.fdi];
+  document.getElementById('submetrics').innerHTML = metrics.map((m,i)=>{
+    const v=vals[i],d=v-pv[i],col=getCol(v);
     return `<div class="metric-card">
-      <div class="metric-head">
-        <div class="metric-tag">${m.tag}</div>
-        <div style="font-size:9px;color:${changeCol};font-weight:700">${i===0||currentSession===0?'':changeStr}</div>
-      </div>
+      <div class="metric-head"><div class="metric-tag">${m.tag}</div>
+        <div style="font-size:9px;color:${d>=0?'var(--green)':'var(--red)'};font-weight:700">${currentSession>0?(d>=0?'▲ +'+d:'▼ '+d):''}</div></div>
       <div class="metric-val" style="color:${col}">${v}</div>
-      <div class="metric-name">${m.name.replace('\n','<br>')}</div>
+      <div class="metric-name">${m.name}</div>
       <div class="metric-bar-bg"><div class="metric-bar" id="bar${i}" style="width:0%;background:${col}"></div></div>
-      <div class="metric-change" style="color:var(--mid);font-size:8.5px">${m.desc}</div>
-    </div>`;
+      <div class="metric-change" style="color:var(--mid);font-size:8.5px">${m.desc}</div></div>`;
   }).join('');
-  setTimeout(() => {
-    vals.forEach((v,i) => {
-      const bar = document.getElementById('bar'+i);
-      if (bar) bar.style.width = v+'%';
-    });
-  }, 100);
+  setTimeout(()=>vals.forEach((v,i)=>{const b=document.getElementById('bar'+i);if(b)b.style.width=v+'%';}),100);
 }
 
-// ══ IMU ROM data ══
-const imuData = [
-  [68, 90, '°', 'Flexion',     180],
-  [44, 70, '°', 'Abduction',   180],
-  [28, 45, '°', 'ER @ 90°',    90],
-  [12, 20, '°', 'IR @ 90°',    90],
-  [82, 95, '%', 'Symmetry',    100],
-  [96, '--','%','Signal Qual', 100],
+const rtdCriteria=[
+  {label:'NRI ≥ 85',met:false,val:'78 / 85'},{label:'BAI ≥ 90%',met:false,val:'85% / 90%'},
+  {label:'SRD ≤ 20%',met:false,val:'26% / 20%'},{label:'Flex ≥ 160°',met:false,val:'68° / 160°'},
+  {label:'FDI < 25',met:true,val:'18 ✓'},{label:'≥ 4 sessions',met:true,val:'4 ✓'},
 ];
-function renderIMU() {
-  const el = document.getElementById('imuGrid');
-  el.innerHTML = imuData.map(([v,norm,unit,lbl,max]) => {
-    const pct = Math.min(100, (v/max)*100);
-    const col = pct > 75 ? 'var(--teal2)' : pct > 50 ? 'var(--amber)' : 'var(--red)';
-    return `<div class="imu-card">
-      <div class="imu-val" style="color:${col}">${v}${unit}</div>
-      <div class="imu-lbl">${lbl}</div>
-      <div class="imu-norm" style="color:var(--mid)">Norm: ${norm}${unit!='%'?unit:''}</div>
-      <div class="imu-bar-bg"><div class="imu-bar" style="width:${pct}%;background:${col}"></div></div>
-    </div>`;
-  }).join('');
-}
-renderIMU();
+document.getElementById('rtdCriteria').innerHTML=rtdCriteria.map(r=>`
+  <div class="rtd-row">
+    <div class="rtd-icon" style="background:${r.met?'#14532d':'#450a0a'};color:${r.met?'var(--green)':'var(--red)'}">${r.met?'✓':'✗'}</div>
+    <span style="flex:1;color:${r.met?'var(--mid)':'var(--white)'}">${r.label}</span>
+    <span style="font-size:9px;color:${r.met?'var(--green)':'var(--amber)'}">${r.val}</span>
+  </div>`).join('');
 
-// ══ RTD criteria ══
-const rtdCriteria = [
-  { label:'NRI ≥ 85',          met:false, val:'78 / 85' },
-  { label:'AI ≥ 90%',          met:false, val:'85% / 90%' },
-  { label:'SRD ≤ 20%',         met:false, val:'26% / 20%' },
-  { label:'Flex ≥ 160°',       met:false, val:'68° / 160°' },
-  { label:'FDI < 25',          met:true,  val:'18 ✓' },
-  { label:'≥ 4 sessions logged',met:true,  val:'4 ✓' },
-];
-function renderRTD() {
-  document.getElementById('rtdCriteria').innerHTML = rtdCriteria.map(r => `
-    <div class="rtd-row">
-      <div class="rtd-icon" style="background:${r.met?'#14532d':'#450a0a'};color:${r.met?'var(--green)':'var(--red)'}">
-        ${r.met?'✓':'✗'}
-      </div>
-      <span style="flex:1;color:${r.met?'var(--mid)':'var(--white)'}">${r.label}</span>
-      <span style="font-size:9px;color:${r.met?'var(--green)':'var(--amber)'}">${r.val}</span>
-    </div>`).join('');
-}
-renderRTD();
+const imuData=[[68,90,'°','Flexion',180],[44,70,'°','Abduction',180],[28,45,'°','ER @ 90°',90],[12,20,'°','IR @ 90°',90],[82,95,'%','Symmetry',100],[96,'--','%','Signal',100]];
+document.getElementById('imuGrid').innerHTML=imuData.map(([v,n,u,l,m])=>{
+  const p=Math.min(100,(v/m)*100),col=p>75?'var(--teal2)':p>50?'var(--amber)':'var(--red)';
+  return `<div class="imu-card"><div class="imu-val" style="color:${col}">${v}${u}</div>
+    <div class="imu-lbl">${l}</div><div class="imu-norm" style="color:var(--mid)">Norm: ${n}${u!='%'?u:''}</div>
+    <div class="imu-bar-bg"><div class="imu-bar" style="width:${p}%;background:${col}"></div></div></div>`;
+}).join('');
 
-// ══ NRI Gauge (half donut) ══
 let gaugeChart;
 function drawGauge(score) {
-  const col = score >= 85 ? '#22c55e' : score >= 65 ? '#f59e0b' : '#ef4444';
-  const ctx = document.getElementById('nriGauge').getContext('2d');
-  if (gaugeChart) gaugeChart.destroy();
-  gaugeChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      datasets: [{
-        data: [score, 100 - score],
-        backgroundColor: [col, '#1e3a5f'],
-        borderWidth: 0,
-        circumference: 180,
-        rotation: 270,
-      }]
-    },
-    options: {
-      plugins: { legend: { display:false }, tooltip: { enabled:false } },
-      animation: { duration: 1200 },
-      cutout: '72%',
-    }
-  });
+  const col=score>=85?'#22c55e':score>=65?'#f59e0b':'#ef4444';
+  const ctx=document.getElementById('nriGauge').getContext('2d');
+  if(gaugeChart)gaugeChart.destroy();
+  gaugeChart=new Chart(ctx,{type:'doughnut',data:{datasets:[{data:[score,100-score],backgroundColor:[col,'#1e3a5f'],borderWidth:0,circumference:180,rotation:270}]},options:{plugins:{legend:{display:false},tooltip:{enabled:false}},animation:{duration:1200},cutout:'72%'}});
 }
 drawGauge(78);
 
-// ══ Animate NRI score counter ══
 function animateCounter(target) {
-  const el = document.getElementById('nriScore');
-  const col = target >= 85 ? '#22c55e' : target >= 65 ? '#f59e0b' : '#ef4444';
-  el.style.color = col;
-  let start = 0; const step = Math.ceil(target / 30);
-  const iv = setInterval(() => {
-    start = Math.min(start + step, target);
-    el.textContent = start;
-    if (start >= target) clearInterval(iv);
-  }, 40);
+  const el=document.getElementById('nriScore');
+  const col=target>=85?'#22c55e':target>=65?'#f59e0b':'#ef4444';
+  el.style.color=col; let s=0;
+  const iv=setInterval(()=>{s=Math.min(s+Math.ceil(target/30),target);el.textContent=s;if(s>=target)clearInterval(iv);},40);
 }
-setTimeout(() => animateCounter(78), 300);
+setTimeout(()=>animateCounter(78),300);
 
-// ══ Session trend chart ══
 let trendChart;
 function drawTrend() {
-  const ctx = document.getElementById('trendChart').getContext('2d');
-  if (trendChart) trendChart.destroy();
-  trendChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: sessions.map(s => s.week + '\n' + s.date.split(' ').slice(0,2).join(' ')),
-      datasets: [{
-        data: sessions.map(s => s.nri),
-        backgroundColor: sessions.map(s => s.nri >= 85 ? '#22c55e' : s.nri >= 65 ? '#f59e0b' : '#ef4444'),
-        borderRadius: 4,
-        borderSkipped: false,
-      }, {
-        type: 'line',
-        data: sessions.map(s => s.nri),
-        borderColor: '#38bdf8',
-        borderWidth: 2,
-        pointBackgroundColor: '#38bdf8',
-        pointRadius: 4,
-        tension: 0.35,
-        fill: false,
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display:false },
-        tooltip: {
-          callbacks: { label: ctx => ` NRI: ${ctx.raw} / 100` }
-        },
-        annotation: {}
-      },
-      scales: {
-        x: { ticks:{color:'#94a3b8',font:{size:9}}, grid:{color:'#1e3a5f'} },
-        y: {
-          min:0, max:100,
-          ticks:{ color:'#94a3b8', font:{size:9}, stepSize:20 },
-          grid:{ color:'#1e3a5f' },
-        }
-      },
-      animation: { duration:1000 }
-    }
-  });
+  const ctx=document.getElementById('trendChart').getContext('2d');
+  if(trendChart)trendChart.destroy();
+  trendChart=new Chart(ctx,{type:'bar',data:{labels:sessions.map(s=>s.week),datasets:[{data:sessions.map(s=>s.nri),backgroundColor:sessions.map(s=>s.nri>=85?'#22c55e':s.nri>=65?'#f59e0b':'#ef4444'),borderRadius:4},{type:'line',data:sessions.map(s=>s.nri),borderColor:'#38bdf8',borderWidth:2,pointBackgroundColor:'#38bdf8',pointRadius:4,tension:.35,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` NRI: ${c.raw}`}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:9}},grid:{color:'#1e3a5f'}},y:{min:0,max:100,ticks:{color:'#94a3b8',font:{size:9},stepSize:20},grid:{color:'#1e3a5f'}}}}});
 }
 drawTrend();
 
-// ══ EMG Waveform (live animated) ══
-const emgCtx = document.getElementById('emgCanvas').getContext('2d');
-const channels = [
-  { name:'Trapezius',    color:'#38bdf8', amp:0.7 },
-  { name:'Infraspinatus',color:'#f59e0b', amp:0.5 },
-  { name:'Deltoid',      color:'#22c55e', amp:0.8 },
-  { name:'Biceps',       color:'#a78bfa', amp:0.4 },
-];
-let emgT = 0;
-let emgChart;
-
-function initEMG() {
-  const pts = 80;
-  const labels = Array.from({length:pts},(_,i)=>'');
-  emgChart = new Chart(emgCtx, {
-    type:'line',
-    data:{
-      labels,
-      datasets: channels.map(ch => ({
-        label:ch.name,
-        data: Array(pts).fill(0),
-        borderColor:ch.color,
-        borderWidth:1.5,
-        pointRadius:0,
-        tension:0.3,
-        fill:false,
-      }))
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      animation:false,
-      plugins:{
-        legend:{
-          display:true,
-          position:'top',
-          labels:{color:'#94a3b8',font:{size:9},boxWidth:10,padding:8}
-        },
-        tooltip:{enabled:false}
-      },
-      scales:{
-        x:{ display:false },
-        y:{
-          min:-1.2, max:1.2,
-          ticks:{color:'#94a3b8',font:{size:9}},
-          grid:{color:'#1e3a5f'}
-        }
-      }
-    }
-  });
+const emgCtx=document.getElementById('emgCanvas').getContext('2d');
+const channels=[{name:'Trapezius',color:'#38bdf8',amp:.7},{name:'Infraspinatus',color:'#f59e0b',amp:.5},{name:'Deltoid',color:'#22c55e',amp:.8},{name:'Biceps',color:'#a78bfa',amp:.4}];
+let emgT=0,emgChart;
+function initEMG(){
+  const pts=80,labels=Array(pts).fill('');
+  emgChart=new Chart(emgCtx,{type:'line',data:{labels,datasets:channels.map(ch=>({label:ch.name,data:Array(pts).fill(0),borderColor:ch.color,borderWidth:1.5,pointRadius:0,tension:.3,fill:false}))},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:true,position:'top',labels:{color:'#94a3b8',font:{size:9},boxWidth:10,padding:8}},tooltip:{enabled:false}},scales:{x:{display:false},y:{min:-1.2,max:1.2,ticks:{color:'#94a3b8',font:{size:9}},grid:{color:'#1e3a5f'}}}}});
 }
 initEMG();
-
-function updateEMG() {
-  emgT += 0.15;
-  channels.forEach((ch,ci) => {
-    const ds = emgChart.data.datasets[ci];
-    ds.data.shift();
-    const noise = (Math.random()-0.5)*0.15;
-    const burst = (Math.sin(emgT*2.1+ci*1.2)*0.5 + Math.sin(emgT*5.3+ci*0.7)*0.3) * ch.amp;
-    const fatigue = ci===1 ? Math.sin(emgT*0.2)*0.15 : 0; // infraspinatus fatigue deviation
-    ds.data.push(burst + noise + fatigue);
-  });
+function updateEMG(){
+  emgT+=.15;
+  channels.forEach((ch,ci)=>{const ds=emgChart.data.datasets[ci];ds.data.shift();const n=(Math.random()-.5)*.15,b=(Math.sin(emgT*2.1+ci*1.2)*.5+Math.sin(emgT*5.3+ci*.7)*.3)*ch.amp,f=ci===1?Math.sin(emgT*.2)*.15:0;ds.data.push(b+n+f);});
   emgChart.update('none');
 }
-setInterval(updateEMG, 50);
+setInterval(updateEMG,50);
 
-// ══ Render current session metrics ══
 renderSubmetrics(sessions[currentSession]);
 
-// ══ Switch session ══
-function switchSession(i) {
-  currentSession = i;
-  const s = sessions[i];
-  renderSessionList();
-  renderSubmetrics(s);
-  drawGauge(s.nri);
-  animateCounter(s.nri);
-  // Update status pill
-  const pill = document.getElementById('statusPill');
-  const col  = s.nri >= 85 ? 'var(--green)' : s.nri >= 65 ? 'var(--amber)' : 'var(--red)';
-  const bg   = s.nri >= 85 ? '#052e16' : s.nri >= 65 ? '#451a03' : '#450a0a';
-  pill.style.cssText = `background:${bg};color:${col};border:1px solid ${col};display:inline-block;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;margin-top:6px`;
-  pill.textContent = '● ' + s.label;
-  document.getElementById('nriScore').style.color = col;
-  // Highlight trend bar
-  trendChart.data.datasets[0].backgroundColor = sessions.map((ss,ii) =>
-    ii === i ? (ss.nri >= 85 ? '#22c55e' : ss.nri >= 65 ? '#f59e0b' : '#ef4444') :
-    (ss.nri >= 85 ? '#166534' : ss.nri >= 65 ? '#78350f' : '#7f1d1d')
-  );
+function switchSession(i){
+  currentSession=i; const s=sessions[i];
+  renderSessionList(); renderSubmetrics(s); drawGauge(s.nri); animateCounter(s.nri);
+  const pill=document.getElementById('statusPill');
+  const col=s.nri>=85?'var(--green)':s.nri>=65?'var(--amber)':'var(--red)';
+  const bg=s.nri>=85?'#052e16':s.nri>=65?'#451a03':'#450a0a';
+  pill.style.cssText=`background:${bg};color:${col};border:1px solid ${col};display:inline-block;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;margin-top:6px`;
+  pill.textContent='● '+s.label;
+  document.getElementById('nriScore').style.color=col;
+  trendChart.data.datasets[0].backgroundColor=sessions.map((ss,ii)=>ii===i?(ss.nri>=85?'#22c55e':ss.nri>=65?'#f59e0b':'#ef4444'):(ss.nri>=85?'#166534':ss.nri>=65?'#78350f':'#7f1d1d'));
   trendChart.update();
+}
+
+// ══════════════════════════════
+// SESSION HISTORY
+// ══════════════════════════════
+let histInited=false;
+function initHistory(){
+  if(histInited)return; histInited=true;
+  // table
+  document.getElementById('histTable').innerHTML=sessions.map((s,i)=>{
+    const col=getCol(s.nri),bg=s.nri>=85?'#052e16':s.nri>=65?'#451a03':'#450a0a';
+    return `<div class="session-row" onclick="switchSession(${i});switchTab('monitor',document.querySelectorAll('.nav-item')[0])">
+      <span style="color:var(--mid);font-size:10px">${s.date.split(', ')[0]}</span>
+      <span style="color:var(--teal2)">${s.week}</span>
+      <span style="color:${col};font-weight:800">${s.nri}</span>
+      <span style="color:${getCol(s.srd)}">${s.srd}</span>
+      <span style="color:${getCol(s.jps)}">${s.jps}</span>
+      <span style="color:${getCol(s.ai)}">${s.ai}</span>
+      <span style="color:${getCol(s.fdi)}">${s.fdi}</span>
+      <span class="s-badge" style="background:${bg};color:${col};font-size:8px">${s.label}</span>
+    </div>`;
+  }).join('');
+  // notes
+  document.getElementById('histNotes').innerHTML=sessions.map((s,i)=>`
+    <div class="note-box">
+      <span>${s.week} · ${s.date} — NRI ${s.nri}</span><br>${s.notes}
+    </div>`).join('');
+  // NRI line chart
+  new Chart(document.getElementById('histNriChart').getContext('2d'),{
+    type:'line',
+    data:{labels:sessions.map(s=>s.week+' ('+s.date.split(' ').slice(0,2).join(' ')+')'),datasets:[
+      {label:'ELSA-NRI',data:sessions.map(s=>s.nri),borderColor:'#38bdf8',backgroundColor:'rgba(56,189,248,.1)',fill:true,borderWidth:2,pointBackgroundColor:sessions.map(s=>getCol(s.nri)),pointRadius:5,tension:.4},
+      {label:'Clearance Threshold',data:[85,85,85,85],borderColor:'#22c55e',borderWidth:1,borderDash:[6,4],pointRadius:0,fill:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:9},boxWidth:12}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:9}},grid:{color:'#1e3a5f'}},y:{min:0,max:100,ticks:{color:'#94a3b8',font:{size:9}},grid:{color:'#1e3a5f'}}}}
+  });
+  // Radar
+  new Chart(document.getElementById('histRadarChart').getContext('2d'),{
+    type:'radar',
+    data:{labels:['SRD','JPS','BAI','FDI','NRI'],datasets:[
+      {label:'Session 4 (W10)',data:[sessions[3].srd,sessions[3].jps,sessions[3].ai,sessions[3].fdi,sessions[3].nri],borderColor:'#38bdf8',backgroundColor:'rgba(56,189,248,.15)',pointBackgroundColor:'#38bdf8',borderWidth:2},
+      {label:'Session 1 (W3)', data:[sessions[0].srd,sessions[0].jps,sessions[0].ai,sessions[0].fdi,sessions[0].nri],borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.1)',pointBackgroundColor:'#ef4444',borderWidth:2},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:9},boxWidth:12}}},scales:{r:{min:0,max:100,ticks:{color:'#94a3b8',font:{size:8},stepSize:20},grid:{color:'#1e3a5f'},pointLabels:{color:'#94a3b8',font:{size:9}}}}}
+  });
+}
+
+// ══════════════════════════════
+// POPULATION
+// ══════════════════════════════
+const patients=[
+  {name:'M. Rodriguez',nri:78,week:'W10',status:'Approaching','dx':'RCR'},
+  {name:'T. Williams',nri:91,week:'W14',status:'Cleared','dx':'Bankart'},
+  {name:'J. Martinez',nri:88,week:'W12',status:'Cleared','dx':'Latarjet'},
+  {name:'A. Thompson',nri:64,week:'W8', status:'Monitor','dx':'RCR'},
+  {name:'C. Patel',   nri:55,week:'W6', status:'Elevated','dx':'Bankart'},
+  {name:'R. Johnson', nri:93,week:'W16',status:'Cleared','dx':'RCR'},
+  {name:'D. Kim',     nri:71,week:'W9', status:'Monitor','dx':'Latarjet'},
+  {name:'S. Davis',   nri:42,week:'W4', status:'High Risk','dx':'RCR'},
+  {name:'B. Wilson',  nri:82,week:'W11',status:'Approaching','dx':'Bankart'},
+  {name:'L. Garcia',  nri:96,week:'W18',status:'Cleared','dx':'RCR'},
+];
+
+let popInited=false;
+function initPopulation(){
+  if(popInited)return; popInited=true;
+  // roster
+  document.getElementById('ptRoster').innerHTML=
+    [...patients].sort((a,b)=>b.nri-a.nri).map(p=>{
+      const col=getCol(p.nri),bg=p.nri>=85?'#052e16':p.nri>=65?'#451a03':'#450a0a';
+      return `<div class="pt-row">
+        <span style="font-weight:600">${p.name}</span>
+        <span style="color:${col};font-weight:800">${p.nri}</span>
+        <div><div class="mini-bar-bg"><div class="mini-bar" style="width:${p.nri}%;background:${col}"></div></div></div>
+        <span style="color:var(--mid)">${p.week}</span>
+        <span class="s-badge" style="background:${bg};color:${col};font-size:8px">${p.status}</span>
+      </div>`;
+    }).join('');
+  // distribution chart
+  const wks=['W3','W4','W5','W6','W7','W8','W9','W10','W11','W12','W14','W16'];
+  const avgs=[32,42,51,55,60,64,69,74,78,83,89,94];
+  new Chart(document.getElementById('popDistChart').getContext('2d'),{
+    type:'line',
+    data:{labels:wks,datasets:[
+      {label:'Cohort Avg NRI',data:avgs,borderColor:'#38bdf8',backgroundColor:'rgba(56,189,248,.1)',fill:true,borderWidth:2,pointRadius:3,tension:.4},
+      {label:'Clearance Threshold (85)',data:Array(12).fill(85),borderColor:'#22c55e',borderWidth:1,borderDash:[6,4],pointRadius:0,fill:false},
+      {label:'M. Rodriguez',data:[null,null,34,null,51,null,67,78,null,null,null,null],borderColor:'#f59e0b',borderWidth:2,pointRadius:5,pointBackgroundColor:'#f59e0b',tension:.4,fill:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:9},boxWidth:12}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:9}},grid:{color:'#1e3a5f'}},y:{min:0,max:100,ticks:{color:'#94a3b8',font:{size:9}},grid:{color:'#1e3a5f'}}}}
+  });
+}
+
+// ══════════════════════════════
+// BILLING
+// ══════════════════════════════
+const billingData=[
+  {date:'Aug 5',pt:'M. Rodriguez',s75:19,s77:52,s80:50,gross:121,fee:36,net:85,status:'pending'},
+  {date:'Aug 5',pt:'T. Williams', s75:0, s77:52,s80:50,gross:102,fee:30,net:72,status:'paid'},
+  {date:'Aug 4',pt:'J. Martinez', s75:0, s77:52,s80:50,gross:102,fee:30,net:72,status:'paid'},
+  {date:'Aug 4',pt:'A. Thompson', s75:19,s77:52,s80:50,gross:121,fee:36,net:85,status:'paid'},
+  {date:'Aug 3',pt:'C. Patel',    s75:19,s77:52,s80:0, gross:71, fee:21,net:50,status:'review'},
+  {date:'Aug 3',pt:'R. Johnson',  s75:0, s77:52,s80:50,gross:102,fee:30,net:72,status:'paid'},
+  {date:'Aug 2',pt:'D. Kim',      s75:0, s77:52,s80:50,gross:102,fee:30,net:72,status:'paid'},
+  {date:'Aug 2',pt:'S. Davis',    s75:19,s77:52,s80:50,gross:121,fee:36,net:85,status:'review'},
+  {date:'Aug 1',pt:'B. Wilson',   s75:0, s77:52,s80:50,gross:102,fee:30,net:72,status:'paid'},
+  {date:'Aug 1',pt:'L. Garcia',   s75:0, s77:52,s80:50,gross:102,fee:30,net:72,status:'paid'},
+];
+const statusTag=s=>s==='paid'?'<span class="status-tag tag-paid">PAID</span>':s==='pending'?'<span class="status-tag tag-pending">PENDING</span>':'<span class="status-tag tag-review">IN REVIEW</span>';
+
+let billInited=false;
+function initBilling(){
+  if(billInited)return; billInited=true;
+  document.getElementById('billingLog').innerHTML=billingData.map(r=>`<tr>
+    <td style="color:var(--mid)">${r.date}</td>
+    <td style="font-weight:600">${r.pt}</td>
+    <td style="color:${r.s75?'var(--green)':'var(--mid)'}">${r.s75?'$'+r.s75:'—'}</td>
+    <td style="color:var(--green)">$${r.s77}</td>
+    <td style="color:${r.s80?'var(--green)':'var(--mid)'}">${r.s80?'$'+r.s80:'—'}</td>
+    <td style="font-weight:700">$${r.gross}</td>
+    <td style="color:var(--mid)">($${r.fee})</td>
+    <td style="color:var(--green);font-weight:700">$${r.net}</td>
+    <td>${statusTag(r.status)}</td></tr>`).join('');
+  new Chart(document.getElementById('billingChart').getContext('2d'),{
+    type:'doughnut',
+    data:{labels:['98975 Setup','98977 Monitoring','98980 Interaction'],datasets:[{data:[190,520,450],backgroundColor:['#0ea5e9','#38bdf8','#7dd3fc'],borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:9},boxWidth:10,padding:8}}}}
+  });
+}
+
+// ══════════════════════════════
+// REPORTS — AI GENERATION
+// ══════════════════════════════
+let currentReportType='clinical';
+function selectReport(type, el){
+  currentReportType=type;
+  document.querySelectorAll('.report-type-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+const reportContent = {
+  clinical: `<div class="report-section">
+    <div class="report-section-title">Executive Summary <span class="conf-badge">98% confidence</span></div>
+    <div class="report-text">Patient <span class="report-highlight">M. Rodriguez</span>, a 42-year-old right-hand dominant male, presents for his <span class="report-highlight">fourth ELSA™ assessment</span> at <span class="report-highlight">10 weeks post rotator cuff repair</span> (surgical date June 3, 2026, Dr. K. Patel). Composite ELSA-NRI score is <span class="report-highlight">78/100</span>, reflecting a trajectory of <span class="report-highlight">+44 points over four sessions</span> and representing meaningful neuromuscular recovery. The patient has not yet reached the clearance threshold of NRI ≥ 85. One clinically significant alert is active.</div>
+  </div>
+  <div class="report-section">
+    <div class="report-section-title">Neuromuscular Assessment — Sub-Metric Analysis <span class="conf-badge">96% confidence</span></div>
+    <div class="report-text">
+      <b style="color:var(--amber)">SRD (Synergy Recruitment Deviation): 74</b> — <span class="report-warn">Elevated. Primary concern this session.</span> The SRD value of 74 exceeds the clearance benchmark of ≥ 80. HD-sEMG data reveals a compensatory activation pattern in the <span class="report-warn">infraspinatus muscle (22% above baseline)</span>, consistent with altered motor programming following RCR. This pattern, if uncorrected, elevates risk of re-injury upon return to high-demand activity. Targeted infraspinatus isolation and neuromuscular re-education are indicated.
+      <br><br>
+      <b style="color:var(--green)">JPS Error Index: 84</b> — <span class="report-ok">Near clearance threshold.</span> Joint position sense has recovered substantially since baseline (58 at W3). The patient demonstrates accurate active shoulder repositioning within ±2° of target in 84% of trials, approaching the ≥ 85 benchmark. This improvement reflects successful proprioceptive retraining and is a positive prognostic indicator.
+      <br><br>
+      <b style="color:var(--green)">BAI (Bilateral Asymmetry Index): 85</b> — <span class="report-ok">Near clearance.</span> Side-to-side neuromuscular symmetry has improved from 55% at initial assessment to 85%, approaching the ≥ 90% threshold. Residual asymmetry is concentrated in abduction endurance tasks.
+      <br><br>
+      <b style="color:var(--green)">FDI (Fatigue Deviation Index): 82</b> — <span class="report-ok">Within acceptable range.</span> EMG spectral analysis shows normal fatigue response patterns. Mean frequency decline and amplitude increase across the repeated-effort protocol fall within normative ranges, indicating adequate muscular endurance at current exercise intensity.
+    </div>
+  </div>
+  <div class="report-section">
+    <div class="report-section-title">Active Alerts <span class="conf-badge">99% confidence</span></div>
+    <div class="report-text" style="background:#2d0a0a;border:1px solid var(--red);border-radius:8px;padding:10px;">
+      ⚠ <b style="color:var(--red)">SRD Elevation — Compensatory Pattern Detected</b><br>
+      Infraspinatus recruitment deviates 22% above established baseline. This pattern is consistent with anterior shoulder compensation strategies observed in post-RCR patients with residual rotator cuff weakness. <span class="report-warn">Recommend immediate exercise load review. Reduce overhead pressing volume by 30–40%. Add 3×15 infraspinatus isolation (side-lying ER) daily. Re-assess in 14 days.</span>
+    </div>
+  </div>
+  <div class="report-section">
+    <div class="report-section-title">Clinical Recommendations <span class="conf-badge">95% confidence</span></div>
+    <div class="report-text">
+      <table class="rec-table">
+        <tr><td>Priority</td><td>Recommendation</td><td>Timeline</td></tr>
+        <tr><td style="color:var(--red)">⚠ High</td><td>Reduce overhead pressing volume 30–40%; add infraspinatus isolation protocol</td><td>Immediate</td></tr>
+        <tr><td style="color:var(--amber)">Moderate</td><td>Continue BAI-targeted bilateral strengthening; focus on abduction endurance</td><td>Next 2 weeks</td></tr>
+        <tr><td style="color:var(--teal2)">Routine</td><td>Maintain proprioceptive training frequency (3×/week); advance JPS complexity</td><td>Ongoing</td></tr>
+        <tr><td style="color:var(--teal2)">Routine</td><td>Schedule Session 5 at Week 12; SRD re-assessment is primary endpoint</td><td>~Aug 19, 2026</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="report-section">
+    <div class="report-section-title">Clearance Projection <span class="conf-badge">89% confidence</span></div>
+    <div class="report-text">Based on the observed NRI trajectory (+44 points over 7 weeks, average +11/session), and assuming the SRD compensatory pattern is addressed, ELSA AI projects the patient will reach the NRI ≥ 85 clearance threshold at <span class="report-highlight">Week 13–14 (Sessions 5–6)</span>, estimated <span class="report-highlight">August 19 – September 2, 2026</span>. This projection carries an 89% confidence interval based on comparison with 847 similar-profile patients in the ELSA training dataset. Factors that could delay clearance include persistence of infraspinatus compensatory recruitment or regression in JPS accuracy.</div>
+  </div>`,
+
+  rtd: `<div class="report-section">
+    <div class="report-section-title">Return-to-Duty Determination — Session 4 <span class="conf-badge">99% confidence</span></div>
+    <div class="report-text"><b style="color:var(--red);font-size:15px;">⬛ NOT CLEARED FOR FULL DUTY</b><br><br>
+    Patient M. Rodriguez does not meet the ELSA-NRI clearance threshold of ≥ 85 at this assessment (NRI: 78). Three of six RTD criteria remain unmet. Estimated clearance: Week 13–14. See full Clinical Progress report for detailed analysis and recommendations.</div>
+  </div>`,
+
+  progress: `<div class="report-section">
+    <div class="report-section-title">Your Recovery Progress — M. Rodriguez <span class="conf-badge">97% confidence</span></div>
+    <div class="report-text">Great news — your shoulder is continuing to improve! Your ELSA readiness score today is <b style="color:var(--amber)">78 out of 100</b>, up from 34 when we first started. Your muscle coordination, balance between both arms, and endurance are all moving in the right direction. We do need a little more work on how the muscles activate together — we spotted a pattern we want to correct before clearing you for full activity. We've adjusted your program accordingly. Keep up the great work and we'll see you at your next session!</div>
+  </div>`,
+
+  billing_report: `<div class="report-section">
+    <div class="report-section-title">RTM Billing Documentation — August 2026 <span class="conf-badge">100% confidence</span></div>
+    <div class="report-text">36 sessions billed in August 2026. Gross revenue: <b style="color:var(--green)">$4,356</b>. Net to clinic after OKT platform fees: <b style="color:var(--green)">$3,128</b>. 2 claims under payer review (patient C. Patel, S. Davis). CPT code mix: 98975 (setup, 8 sessions), 98977 (monitoring, 36 sessions), 98980 (interaction, 30 sessions). All documentation meets CMS remote therapeutic monitoring requirements.</div>
+  </div>`,
+
+  surgeon: `<div class="report-section">
+    <div class="report-section-title">Surgeon Communication — Dr. K. Patel <span class="conf-badge">97% confidence</span></div>
+    <div class="report-text">Dear Dr. Patel,<br><br>I am writing to update you on M. Rodriguez (DOB redacted, RCR June 3, 2026). At his 10-week ELSA assessment (Session 4, August 5, 2026), his composite ELSA-NRI score is 78/100, up from 34 at Week 3. Proprioceptive recovery is excellent (JPS: 84) and bilateral symmetry is approaching clearance (BAI: 85). The primary concern is an elevated synergy recruitment deviation in the infraspinatus (SRD: 74, compensatory pattern 22% above baseline). We have modified his program accordingly and project clearance at Week 13–14. I will update you following Session 5.<br><br>Regards,<br>Dr. John Kia, PT — Apex Orthopedic Rehab</div>
+  </div>`,
+};
+
+function generateReport() {
+  const btn = document.getElementById('genBtn');
+  const body = document.getElementById('reportBody');
+  const footer = document.getElementById('aiFooter');
+  btn.disabled = true;
+  btn.textContent = '✦ Generating...';
+
+  // Show generating animation
+  const steps = [
+    'Retrieving session data and EMG signals...',
+    'Analyzing sub-metric trends across 4 sessions...',
+    'Cross-referencing 12,847 similar patient profiles...',
+    'Generating clinical narrative...',
+    'Applying safety review filter...',
+    'Report ready.'
+  ];
+  let stepIdx = 0;
+  body.innerHTML = `<div class="generating-overlay">
+    <div class="ai-spinner"></div>
+    <div class="gen-label">✦ ELSA Clinical AI — Generating Report</div>
+    <div class="gen-steps" id="genSteps">
+      ${steps.map((s,i)=>`<div class="gen-step" id="step${i}"><div class="gen-step-dot"></div>${s}</div>`).join('')}
+    </div>
+  </div>`;
+
+  const stepInterval = setInterval(() => {
+    if (stepIdx > 0) document.getElementById('step'+(stepIdx-1)).className = 'gen-step done';
+    if (stepIdx < steps.length) {
+      document.getElementById('step'+stepIdx).className = 'gen-step active';
+      stepIdx++;
+    } else {
+      clearInterval(stepInterval);
+      setTimeout(() => streamReport(body, btn, footer), 300);
+    }
+  }, 380);
+}
+
+function streamReport(body, btn, footer) {
+  const content = reportContent[currentReportType] || reportContent.clinical;
+  // Strip HTML tags to get plain text length, then stream the full HTML
+  body.innerHTML = '<span id="streamTarget"></span><span class="cursor"></span>';
+  const target = document.getElementById('streamTarget');
+
+  // We'll stream by progressively revealing the full HTML
+  const words = content.split(/(?<=>\s*\S)/); // rough split
+  let i = 0;
+  // Simpler approach: reveal the full content then animate a typing effect by word
+  target.innerHTML = '';
+  const fullHTML = content;
+  const chunks = [];
+  let cur = '';
+  for (let c of fullHTML) { cur += c; if (cur.length >= 8) { chunks.push(cur); cur=''; } }
+  if (cur) chunks.push(cur);
+
+  let ci = 0;
+  const stream = setInterval(() => {
+    if (ci < chunks.length) {
+      target.innerHTML += chunks[ci];
+      ci++;
+      body.scrollTop = body.scrollHeight;
+    } else {
+      clearInterval(stream);
+      // Remove cursor
+      const cur = body.querySelector('.cursor');
+      if (cur) cur.remove();
+      // Show footer
+      footer.style.display = 'flex';
+      document.getElementById('genTime').textContent = 'Generated ' + new Date().toLocaleTimeString();
+      btn.disabled = false;
+      btn.textContent = '✦ Regenerate';
+    }
+  }, 12);
 }
 </script>
 </body>
