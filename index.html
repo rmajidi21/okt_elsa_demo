@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ELSA™ Clinician Dashboard — OrthoKinetic Track</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy:   #0f2744;
+    --navy2:  #1e3a5f;
+    --navy3:  #162d4a;
+    --teal:   #0ea5e9;
+    --teal2:  #38bdf8;
+    --green:  #22c55e;
+    --green2: #16a34a;
+    --amber:  #f59e0b;
+    --red:    #ef4444;
+    --white:  #ffffff;
+    --lt:     #f1f5f9;
+    --mid:    #94a3b8;
+    --dark:   #0f172a;
+    --border: #1e3a5f;
+    --panel:  #132038;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 13px;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Top bar ── */
+  .topbar {
+    background: var(--dark);
+    border-bottom: 2px solid var(--teal);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 20px;
+    flex-shrink: 0;
+  }
+  .logo { display:flex; align-items:center; gap:10px; }
+  .logo-mark {
+    width:32px; height:32px; border-radius:6px;
+    background: linear-gradient(135deg, var(--teal), #0369a1);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:900; font-size:13px; color:white;
+  }
+  .logo-name { font-weight:700; font-size:16px; color:white; }
+  .logo-sub  { font-size:10px; color:var(--teal2); }
+  .topbar-center { display:flex; gap:24px; }
+  .nav-item {
+    padding:4px 12px; border-radius:4px; font-size:12px;
+    color:var(--mid); cursor:pointer; transition:.2s;
+  }
+  .nav-item.active { background:var(--navy2); color:var(--teal2); font-weight:600; }
+  .topbar-right { display:flex; align-items:center; gap:16px; }
+  .live-badge {
+    display:flex; align-items:center; gap:5px;
+    background:#052e16; border:1px solid var(--green);
+    border-radius:20px; padding:3px 10px; font-size:11px; color:var(--green);
+  }
+  .live-dot { width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .alert-btn {
+    background:var(--red); border-radius:20px; padding:3px 12px;
+    font-size:11px; font-weight:700; animation:alertpulse 2s infinite;
+  }
+  @keyframes alertpulse { 0%,100%{opacity:1} 50%{opacity:.7} }
+  .user-chip { display:flex;align-items:center;gap:6px;color:var(--mid);font-size:11px; }
+  .avatar {
+    width:26px;height:26px;border-radius:50%;
+    background:linear-gradient(135deg,var(--teal),#0369a1);
+    display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;
+  }
+
+  /* ── Main layout ── */
+  .main { display:flex; flex:1; overflow:hidden; gap:0; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width:220px; background:var(--dark); border-right:1px solid var(--border);
+    display:flex; flex-direction:column; flex-shrink:0;
+    padding:12px 0;
+  }
+  .sidebar-section { padding:0 12px; margin-bottom:8px; }
+  .sidebar-label { font-size:9px; color:var(--mid); text-transform:uppercase; letter-spacing:.8px; margin-bottom:6px; padding-left:8px; }
+  .patient-card {
+    background:var(--panel); border:1px solid var(--border); border-radius:8px;
+    padding:10px; margin:0 8px 12px;
+  }
+  .patient-name { font-weight:700; font-size:13px; margin-bottom:2px; }
+  .patient-meta { font-size:10px; color:var(--mid); line-height:1.6; }
+  .patient-meta span { color:var(--teal2); }
+  .session-list { display:flex; flex-direction:column; gap:2px; padding:0 8px; }
+  .session-item {
+    display:flex; align-items:center; gap:8px; padding:6px 8px;
+    border-radius:6px; cursor:pointer; transition:.15s;
+  }
+  .session-item.active { background:var(--navy2); }
+  .session-item:hover:not(.active) { background:#1a2a40; }
+  .s-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
+  .s-info { flex:1; }
+  .s-date { font-size:10px; color:var(--mid); }
+  .s-score { font-size:11px; font-weight:700; }
+  .s-badge { font-size:9px; padding:1px 5px; border-radius:3px; font-weight:700; }
+
+  /* ── Center panel ── */
+  .center { flex:1; display:flex; flex-direction:column; gap:0; overflow:hidden; }
+
+  /* ── NRI hero ── */
+  .nri-hero {
+    background: linear-gradient(135deg, var(--navy2) 0%, var(--navy3) 100%);
+    border-bottom:1px solid var(--border);
+    padding:16px 20px;
+    display:flex; align-items:center; gap:24px;
+    flex-shrink:0;
+  }
+  .nri-gauge-wrap { position:relative; width:130px; height:80px; flex-shrink:0; }
+  .nri-gauge-wrap canvas { position:absolute; top:0; left:0; }
+  .nri-center-text {
+    position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+    text-align:center; width:120px;
+  }
+  .nri-score { font-size:28px; font-weight:900; line-height:1; }
+  .nri-label { font-size:9px; color:var(--mid); }
+  .nri-info { flex:1; }
+  .nri-title { font-size:16px; font-weight:800; margin-bottom:2px; }
+  .nri-sub { font-size:10px; color:var(--mid); max-width:300px; line-height:1.5; }
+  .status-pill {
+    display:inline-block; padding:4px 14px; border-radius:20px;
+    font-size:12px; font-weight:700; margin-top:6px;
+  }
+  .nri-kpis { display:flex; flex-direction:column; gap:6px; }
+  .nri-kpi { text-align:center; }
+  .nri-kpi-v { font-size:18px; font-weight:800; color:var(--teal2); }
+  .nri-kpi-l { font-size:9px; color:var(--mid); }
+
+  /* ── Sub-metrics ── */
+  .submetrics {
+    display:grid; grid-template-columns:repeat(4,1fr);
+    gap:1px; background:var(--border);
+    border-bottom:1px solid var(--border);
+    flex-shrink:0;
+  }
+  .metric-card {
+    background:var(--panel); padding:10px 14px;
+    display:flex; flex-direction:column; gap:4px;
+  }
+  .metric-head { display:flex; justify-content:space-between; align-items:flex-start; }
+  .metric-tag { font-size:9px; font-weight:700; color:var(--teal); letter-spacing:.5px; }
+  .metric-val { font-size:20px; font-weight:900; line-height:1; }
+  .metric-name { font-size:10px; color:var(--mid); line-height:1.3; margin-top:2px; }
+  .metric-bar-bg { height:4px; background:#1e3a5f; border-radius:2px; overflow:hidden; }
+  .metric-bar { height:4px; border-radius:2px; transition:width 1.5s ease; }
+  .metric-change { font-size:9px; margin-top:3px; }
+
+  /* ── Bottom panels ── */
+  .bottom-panels {
+    flex:1; display:grid; grid-template-columns:1fr 1fr;
+    gap:1px; background:var(--border); overflow:hidden;
+  }
+  .panel {
+    background:var(--panel); padding:12px 14px;
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  .panel-title {
+    font-size:10px; font-weight:700; color:var(--teal2);
+    text-transform:uppercase; letter-spacing:.6px;
+    margin-bottom:8px; flex-shrink:0;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .panel-tag { font-size:9px; color:var(--mid); text-transform:none; font-weight:400; letter-spacing:0; }
+  .chart-wrap { flex:1; position:relative; min-height:0; }
+
+  /* ── Right panel ── */
+  .right-panel {
+    width:220px; background:var(--dark); border-left:1px solid var(--border);
+    display:flex; flex-direction:column; gap:0; flex-shrink:0;
+    overflow-y:auto;
+  }
+  .rp-section { padding:12px; border-bottom:1px solid var(--border); }
+  .rp-title {
+    font-size:9px; font-weight:700; color:var(--teal); letter-spacing:.6px;
+    text-transform:uppercase; margin-bottom:8px;
+  }
+  .rtd-badge {
+    border-radius:8px; padding:10px; text-align:center; margin-bottom:8px;
+  }
+  .rtd-score { font-size:24px; font-weight:900; }
+  .rtd-label { font-size:10px; margin-top:2px; }
+  .rtd-criteria { display:flex; flex-direction:column; gap:4px; }
+  .rtd-row { display:flex; align-items:center; gap:6px; font-size:10px; }
+  .rtd-icon { width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0; }
+  .imu-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .imu-card { background:var(--navy2); border-radius:6px; padding:7px; }
+  .imu-val { font-size:16px; font-weight:800; color:var(--teal2); }
+  .imu-lbl { font-size:9px; color:var(--mid); }
+  .imu-norm { font-size:9px; color:var(--mid); }
+  .imu-bar-bg { height:3px; background:#1e3a5f; border-radius:2px; margin-top:4px; }
+  .imu-bar { height:3px; border-radius:2px; transition:width 1.5s ease; }
+  .rtm-rows { display:flex; flex-direction:column; gap:4px; }
+  .rtm-row { display:flex; justify-content:space-between; align-items:center; font-size:10px; }
+  .rtm-code { color:var(--mid); }
+  .rtm-amt { font-weight:700; color:var(--green); }
+  .rtm-total { border-top:1px solid var(--border); padding-top:5px; margin-top:2px; }
+  .alert-card {
+    background:#2d0a0a; border:1px solid var(--red); border-radius:6px;
+    padding:8px; margin-bottom:6px;
+  }
+  .alert-title { font-size:10px; font-weight:700; color:var(--red); margin-bottom:3px; }
+  .alert-text { font-size:9px; color:#fca5a5; line-height:1.4; }
+
+  /* ── EMG waveform ── */
+  #emgCanvas { width:100% !important; }
+
+  /* ── Animated counter ── */
+  .counter { display:inline-block; }
+
+  /* ── Timestamp ── */
+  .timestamp { font-size:9px; color:var(--mid); }
+
+  /* ── Session trend sparkline ── */
+  .trend-row {
+    display:flex; gap:4px; align-items:flex-end;
+    height:32px; margin:4px 0;
+  }
+  .trend-bar {
+    flex:1; border-radius:2px 2px 0 0; min-width:0;
+    transition:height 1s ease;
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-mark">OKT</div>
+    <div>
+      <div class="logo-name">ELSA™ <span style="font-weight:400;color:var(--mid)">Clinician Dashboard</span></div>
+      <div class="logo-sub">Enhanced Live Shoulder Assist · OrthoKinetic Track Inc.</div>
+    </div>
+  </div>
+  <div class="topbar-center">
+    <div class="nav-item active">Patient Monitor</div>
+    <div class="nav-item">Session History</div>
+    <div class="nav-item">Population</div>
+    <div class="nav-item">RTM Billing</div>
+    <div class="nav-item">Reports</div>
+  </div>
+  <div class="topbar-right">
+    <div class="live-badge"><div class="live-dot"></div>LIVE SESSION</div>
+    <div class="alert-btn">⚠ 1 ALERT</div>
+    <div class="user-chip"><div class="avatar">DR</div>Dr. Reynolds, PT · Central Mass PT</div>
+    <div class="timestamp" id="clock"></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="patient-card">
+      <div class="patient-name">M. Rodriguez</div>
+      <div class="patient-meta">
+        42M · RHD<br>
+        Dx: <span>Rotator Cuff Repair (R)</span><br>
+        Surgery: <span>Jun 3, 2026</span><br>
+        Week: <span>10 post-op</span><br>
+        Surgeon: <span>Dr. K. Patel</span>
+      </div>
+    </div>
+    <div class="sidebar-label">Session History</div>
+    <div class="session-list" id="sessionList"></div>
+  </div>
+
+  <!-- CENTER -->
+  <div class="center">
+
+    <!-- NRI HERO -->
+    <div class="nri-hero">
+      <div class="nri-gauge-wrap">
+        <canvas id="nriGauge" width="130" height="80"></canvas>
+        <div class="nri-center-text">
+          <div class="nri-score" id="nriScore" style="color:var(--amber)">--</div>
+          <div class="nri-label">ELSA-NRI</div>
+        </div>
+      </div>
+      <div class="nri-info">
+        <div class="nri-title">ELSA Neuromuscular Readiness Index™</div>
+        <div class="nri-sub">Composite score (0–100) integrating 4 neuromuscular sub-metrics. Captures multi-dimensional shoulder readiness for objective RTD/RTP decision support.</div>
+        <div class="status-pill" id="statusPill" style="background:#451a03;color:var(--amber);border:1px solid var(--amber)">● APPROACHING READINESS</div>
+      </div>
+      <div class="nri-kpis">
+        <div class="nri-kpi"><div class="nri-kpi-v" id="sessionNum">S4</div><div class="nri-kpi-l">Session</div></div>
+        <div class="nri-kpi"><div class="nri-kpi-v">10W</div><div class="nri-kpi-l">Post-Op</div></div>
+        <div class="nri-kpi"><div class="nri-kpi-v" style="color:var(--green)">+11</div><div class="nri-kpi-l">vs Last Session</div></div>
+      </div>
+    </div>
+
+    <!-- SUB-METRICS -->
+    <div class="submetrics" id="submetrics">
+      <!-- rendered by JS -->
+    </div>
+
+    <!-- BOTTOM PANELS -->
+    <div class="bottom-panels">
+      <div class="panel">
+        <div class="panel-title">
+          EMG — Raw Neuromuscular Signal
+          <span class="panel-tag">sEMG · 4-channel · 2kHz · Bluetooth LE</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="emgCanvas"></canvas>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">
+          ELSA-NRI · Session Trajectory
+          <span class="panel-tag">Sessions 1–4 · Target ≥ 85</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- RTD -->
+    <div class="rp-section">
+      <div class="rp-title">RTD / RTP Decision Support</div>
+      <div class="rtd-badge" style="background:#172554;border:1px solid var(--amber)" id="rtdBadge">
+        <div class="rtd-score" style="color:var(--amber)">NOT CLEARED</div>
+        <div class="rtd-label" style="color:var(--mid)">Threshold: NRI ≥ 85</div>
+      </div>
+      <div class="rtd-criteria" id="rtdCriteria"></div>
+    </div>
+
+    <!-- ALERT -->
+    <div class="rp-section">
+      <div class="rp-title">Active Alerts</div>
+      <div class="alert-card">
+        <div class="alert-title">⚠ SRD Elevation</div>
+        <div class="alert-text">Synergy Recruitment Deviation 22% above baseline. Compensatory recruitment pattern detected in infraspinatus. Review exercise load.</div>
+      </div>
+    </div>
+
+    <!-- IMU ROM -->
+    <div class="rp-section">
+      <div class="rp-title">IMU · Range of Motion</div>
+      <div class="imu-grid" id="imuGrid"></div>
+    </div>
+
+    <!-- RTM BILLING -->
+    <div class="rp-section">
+      <div class="rp-title">RTM Billing — This Session</div>
+      <div class="rtm-rows">
+        <div class="rtm-row"><span class="rtm-code">98975 — Setup</span><span class="rtm-amt">$19</span></div>
+        <div class="rtm-row"><span class="rtm-code">98977 — Monitoring</span><span class="rtm-amt">$52</span></div>
+        <div class="rtm-row"><span class="rtm-code">98980 — Interaction</span><span class="rtm-amt">$50</span></div>
+        <div class="rtm-row rtm-total"><span style="font-weight:700">Session Revenue</span><span class="rtm-amt">$121</span></div>
+        <div class="rtm-row" style="font-size:9px;color:var(--mid)"><span>OKT Platform Fee</span><span style="color:var(--mid)">($36)</span></div>
+        <div class="rtm-row" style="font-size:9px;"><span style="color:var(--mid)">Net to Clinic</span><span style="color:var(--green);font-weight:700">$85</span></div>
+      </div>
+    </div>
+
+    <!-- DEVICE STATUS -->
+    <div class="rp-section">
+      <div class="rp-title">ELSA Device Status</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div class="rtm-row"><span style="color:var(--mid)">Connection</span><span style="color:var(--green);font-size:10px">● BLE Active</span></div>
+        <div class="rtm-row"><span style="color:var(--mid)">Signal Quality</span><span style="color:var(--green);font-size:10px">● 96%</span></div>
+        <div class="rtm-row"><span style="color:var(--mid)">Battery</span><span style="color:var(--teal2);font-size:10px">82%</span></div>
+        <div class="rtm-row"><span style="color:var(--mid)">Firmware</span><span style="color:var(--mid);font-size:10px">v2.4.1</span></div>
+        <div class="rtm-row"><span style="color:var(--mid)">Data Rate</span><span style="color:var(--teal2);font-size:10px">2 kHz · 4ch</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══ Clock ══
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateClock, 1000); updateClock();
+
+// ══ Session data ══
+const sessions = [
+  { date:'Jun 24, 2026', week:'W3', nri:34, color:'var(--red)',    label:'HIGH RISK',          srd:62, jps:58, ai:55, fdi:60 },
+  { date:'Jul 8, 2026',  week:'W5', nri:51, color:'var(--red)',    label:'ELEVATED RISK',       srd:74, jps:64, ai:68, fdi:70 },
+  { date:'Jul 22, 2026', week:'W7', nri:67, color:'var(--amber)',  label:'MONITOR',             srd:82, jps:73, ai:77, fdi:75 },
+  { date:'Aug 5, 2026',  week:'W10',nri:78, color:'var(--amber)',  label:'APPROACHING READY',   srd:74, jps:84, ai:85, fdi:82 },
+];
+let currentSession = 3;
+
+// ══ Render session list ══
+function renderSessionList() {
+  const el = document.getElementById('sessionList');
+  el.innerHTML = sessions.map((s,i) => {
+    const score = s.nri;
+    const col = score >= 85 ? 'var(--green)' : score >= 65 ? 'var(--amber)' : 'var(--red)';
+    const bgCol = score >= 85 ? '#14532d' : score >= 65 ? '#451a03' : '#450a0a';
+    return `<div class="session-item ${i===currentSession?'active':''}" onclick="switchSession(${i})">
+      <div class="s-dot" style="background:${col}"></div>
+      <div class="s-info">
+        <div class="s-date">${s.date} · ${s.week}</div>
+        <div class="s-score" style="color:${col}">NRI: ${score} <span class="s-badge" style="background:${bgCol};color:${col}">${s.label}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+renderSessionList();
+
+// ══ Sub-metrics data ══
+const metrics = [
+  { tag:'SRD', name:'Synergy Recruitment\nDeviation', desc:'Departure from coordinated muscle synergy patterns', unit:'%', invert:true },
+  { tag:'JPS', name:'Joint Position Sense\nError Index', desc:'Proprioceptive accuracy during active shoulder repositioning', unit:'°', invert:true },
+  { tag:'AI',  name:'Bilateral Asymmetry\nIndex', desc:'Limb symmetry of neuromuscular activation — operative vs. contralateral', unit:'%', invert:true },
+  { tag:'FDI', name:'Fatigue Deviation\nIndex', desc:'Spectral & amplitude EMG changes under repeated-effort protocol', unit:'', invert:true },
+];
+
+function getMetricColor(val) {
+  if (val >= 80) return 'var(--green)';
+  if (val >= 65) return 'var(--amber)';
+  return 'var(--red)';
+}
+
+function renderSubmetrics(s) {
+  const vals = [s.srd, s.jps, s.ai, s.fdi];
+  const prev = sessions[Math.max(0, currentSession-1)];
+  const prevVals = [prev.srd, prev.jps, prev.ai, prev.fdi];
+  const el = document.getElementById('submetrics');
+  el.innerHTML = metrics.map((m,i) => {
+    const v = vals[i]; const pv = prevVals[i];
+    const diff = v - pv; const col = getMetricColor(v);
+    const barPct = v + '%';
+    const changeStr = diff >= 0 ? `▲ +${diff}` : `▼ ${diff}`;
+    const changeCol = diff >= 0 ? 'var(--green)' : 'var(--red)';
+    return `<div class="metric-card">
+      <div class="metric-head">
+        <div class="metric-tag">${m.tag}</div>
+        <div style="font-size:9px;color:${changeCol};font-weight:700">${i===0||currentSession===0?'':changeStr}</div>
+      </div>
+      <div class="metric-val" style="color:${col}">${v}</div>
+      <div class="metric-name">${m.name.replace('\n','<br>')}</div>
+      <div class="metric-bar-bg"><div class="metric-bar" id="bar${i}" style="width:0%;background:${col}"></div></div>
+      <div class="metric-change" style="color:var(--mid);font-size:8.5px">${m.desc}</div>
+    </div>`;
+  }).join('');
+  setTimeout(() => {
+    vals.forEach((v,i) => {
+      const bar = document.getElementById('bar'+i);
+      if (bar) bar.style.width = v+'%';
+    });
+  }, 100);
+}
+
+// ══ IMU ROM data ══
+const imuData = [
+  [68, 90, '°', 'Flexion',     180],
+  [44, 70, '°', 'Abduction',   180],
+  [28, 45, '°', 'ER @ 90°',    90],
+  [12, 20, '°', 'IR @ 90°',    90],
+  [82, 95, '%', 'Symmetry',    100],
+  [96, '--','%','Signal Qual', 100],
+];
+function renderIMU() {
+  const el = document.getElementById('imuGrid');
+  el.innerHTML = imuData.map(([v,norm,unit,lbl,max]) => {
+    const pct = Math.min(100, (v/max)*100);
+    const col = pct > 75 ? 'var(--teal2)' : pct > 50 ? 'var(--amber)' : 'var(--red)';
+    return `<div class="imu-card">
+      <div class="imu-val" style="color:${col}">${v}${unit}</div>
+      <div class="imu-lbl">${lbl}</div>
+      <div class="imu-norm" style="color:var(--mid)">Norm: ${norm}${unit!='%'?unit:''}</div>
+      <div class="imu-bar-bg"><div class="imu-bar" style="width:${pct}%;background:${col}"></div></div>
+    </div>`;
+  }).join('');
+}
+renderIMU();
+
+// ══ RTD criteria ══
+const rtdCriteria = [
+  { label:'NRI ≥ 85',          met:false, val:'78 / 85' },
+  { label:'AI ≥ 90%',          met:false, val:'85% / 90%' },
+  { label:'SRD ≤ 20%',         met:false, val:'26% / 20%' },
+  { label:'Flex ≥ 160°',       met:false, val:'68° / 160°' },
+  { label:'FDI < 25',          met:true,  val:'18 ✓' },
+  { label:'≥ 4 sessions logged',met:true,  val:'4 ✓' },
+];
+function renderRTD() {
+  document.getElementById('rtdCriteria').innerHTML = rtdCriteria.map(r => `
+    <div class="rtd-row">
+      <div class="rtd-icon" style="background:${r.met?'#14532d':'#450a0a'};color:${r.met?'var(--green)':'var(--red)'}">
+        ${r.met?'✓':'✗'}
+      </div>
+      <span style="flex:1;color:${r.met?'var(--mid)':'var(--white)'}">${r.label}</span>
+      <span style="font-size:9px;color:${r.met?'var(--green)':'var(--amber)'}">${r.val}</span>
+    </div>`).join('');
+}
+renderRTD();
+
+// ══ NRI Gauge (half donut) ══
+let gaugeChart;
+function drawGauge(score) {
+  const col = score >= 85 ? '#22c55e' : score >= 65 ? '#f59e0b' : '#ef4444';
+  const ctx = document.getElementById('nriGauge').getContext('2d');
+  if (gaugeChart) gaugeChart.destroy();
+  gaugeChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [score, 100 - score],
+        backgroundColor: [col, '#1e3a5f'],
+        borderWidth: 0,
+        circumference: 180,
+        rotation: 270,
+      }]
+    },
+    options: {
+      plugins: { legend: { display:false }, tooltip: { enabled:false } },
+      animation: { duration: 1200 },
+      cutout: '72%',
+    }
+  });
+}
+drawGauge(78);
+
+// ══ Animate NRI score counter ══
+function animateCounter(target) {
+  const el = document.getElementById('nriScore');
+  const col = target >= 85 ? '#22c55e' : target >= 65 ? '#f59e0b' : '#ef4444';
+  el.style.color = col;
+  let start = 0; const step = Math.ceil(target / 30);
+  const iv = setInterval(() => {
+    start = Math.min(start + step, target);
+    el.textContent = start;
+    if (start >= target) clearInterval(iv);
+  }, 40);
+}
+setTimeout(() => animateCounter(78), 300);
+
+// ══ Session trend chart ══
+let trendChart;
+function drawTrend() {
+  const ctx = document.getElementById('trendChart').getContext('2d');
+  if (trendChart) trendChart.destroy();
+  trendChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: sessions.map(s => s.week + '\n' + s.date.split(' ').slice(0,2).join(' ')),
+      datasets: [{
+        data: sessions.map(s => s.nri),
+        backgroundColor: sessions.map(s => s.nri >= 85 ? '#22c55e' : s.nri >= 65 ? '#f59e0b' : '#ef4444'),
+        borderRadius: 4,
+        borderSkipped: false,
+      }, {
+        type: 'line',
+        data: sessions.map(s => s.nri),
+        borderColor: '#38bdf8',
+        borderWidth: 2,
+        pointBackgroundColor: '#38bdf8',
+        pointRadius: 4,
+        tension: 0.35,
+        fill: false,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display:false },
+        tooltip: {
+          callbacks: { label: ctx => ` NRI: ${ctx.raw} / 100` }
+        },
+        annotation: {}
+      },
+      scales: {
+        x: { ticks:{color:'#94a3b8',font:{size:9}}, grid:{color:'#1e3a5f'} },
+        y: {
+          min:0, max:100,
+          ticks:{ color:'#94a3b8', font:{size:9}, stepSize:20 },
+          grid:{ color:'#1e3a5f' },
+        }
+      },
+      animation: { duration:1000 }
+    }
+  });
+}
+drawTrend();
+
+// ══ EMG Waveform (live animated) ══
+const emgCtx = document.getElementById('emgCanvas').getContext('2d');
+const channels = [
+  { name:'Trapezius',    color:'#38bdf8', amp:0.7 },
+  { name:'Infraspinatus',color:'#f59e0b', amp:0.5 },
+  { name:'Deltoid',      color:'#22c55e', amp:0.8 },
+  { name:'Biceps',       color:'#a78bfa', amp:0.4 },
+];
+let emgT = 0;
+let emgChart;
+
+function initEMG() {
+  const pts = 80;
+  const labels = Array.from({length:pts},(_,i)=>'');
+  emgChart = new Chart(emgCtx, {
+    type:'line',
+    data:{
+      labels,
+      datasets: channels.map(ch => ({
+        label:ch.name,
+        data: Array(pts).fill(0),
+        borderColor:ch.color,
+        borderWidth:1.5,
+        pointRadius:0,
+        tension:0.3,
+        fill:false,
+      }))
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      animation:false,
+      plugins:{
+        legend:{
+          display:true,
+          position:'top',
+          labels:{color:'#94a3b8',font:{size:9},boxWidth:10,padding:8}
+        },
+        tooltip:{enabled:false}
+      },
+      scales:{
+        x:{ display:false },
+        y:{
+          min:-1.2, max:1.2,
+          ticks:{color:'#94a3b8',font:{size:9}},
+          grid:{color:'#1e3a5f'}
+        }
+      }
+    }
+  });
+}
+initEMG();
+
+function updateEMG() {
+  emgT += 0.15;
+  channels.forEach((ch,ci) => {
+    const ds = emgChart.data.datasets[ci];
+    ds.data.shift();
+    const noise = (Math.random()-0.5)*0.15;
+    const burst = (Math.sin(emgT*2.1+ci*1.2)*0.5 + Math.sin(emgT*5.3+ci*0.7)*0.3) * ch.amp;
+    const fatigue = ci===1 ? Math.sin(emgT*0.2)*0.15 : 0; // infraspinatus fatigue deviation
+    ds.data.push(burst + noise + fatigue);
+  });
+  emgChart.update('none');
+}
+setInterval(updateEMG, 50);
+
+// ══ Render current session metrics ══
+renderSubmetrics(sessions[currentSession]);
+
+// ══ Switch session ══
+function switchSession(i) {
+  currentSession = i;
+  const s = sessions[i];
+  renderSessionList();
+  renderSubmetrics(s);
+  drawGauge(s.nri);
+  animateCounter(s.nri);
+  // Update status pill
+  const pill = document.getElementById('statusPill');
+  const col  = s.nri >= 85 ? 'var(--green)' : s.nri >= 65 ? 'var(--amber)' : 'var(--red)';
+  const bg   = s.nri >= 85 ? '#052e16' : s.nri >= 65 ? '#451a03' : '#450a0a';
+  pill.style.cssText = `background:${bg};color:${col};border:1px solid ${col};display:inline-block;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;margin-top:6px`;
+  pill.textContent = '● ' + s.label;
+  document.getElementById('nriScore').style.color = col;
+  // Highlight trend bar
+  trendChart.data.datasets[0].backgroundColor = sessions.map((ss,ii) =>
+    ii === i ? (ss.nri >= 85 ? '#22c55e' : ss.nri >= 65 ? '#f59e0b' : '#ef4444') :
+    (ss.nri >= 85 ? '#166534' : ss.nri >= 65 ? '#78350f' : '#7f1d1d')
+  );
+  trendChart.update();
+}
+</script>
+</body>
+</html>
