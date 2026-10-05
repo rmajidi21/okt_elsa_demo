@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OKT Sports Investor Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<style>
+:root{
+  --bg:#F3F6F9; --surface:#FFFFFF; --surface-2:#EAF0F5;
+  --ink:#0F1E33; --ink-2:#44546A; --muted:#6F7E92; --line:#D9E1EA; --grid:#E6ECF2;
+  --accent:#0B7FA3; --accent-soft:#9FCFE0; --accent-ink:#075E79;
+  --warm:#B7791F;
+  --good:#2F8A6E; --warn:#B7791F; --crit:#B5503A;
+  --band:#0F1E33; --band-ink:#EAF0F7; --band-ink-2:#A9B7C9; --band-accent:#5CC3E3;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0B1628; --surface:#12213A; --surface-2:#182A47;
+    --ink:#EAF0F7; --ink-2:#A9B7C9; --muted:#8193AA; --line:#233756; --grid:#1D3050;
+    --accent:#2BA3CC; --accent-soft:#1F5B74; --accent-ink:#7FD0EA;
+    --warm:#B98228;
+    --good:#4DB392; --warn:#D9A548; --crit:#D9785F;
+    --band:#081120; --band-ink:#EAF0F7; --band-ink-2:#9FB0C6; --band-accent:#5CC3E3;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0B1628; --surface:#12213A; --surface-2:#182A47;
+  --ink:#EAF0F7; --ink-2:#A9B7C9; --muted:#8193AA; --line:#233756; --grid:#1D3050;
+  --accent:#2BA3CC; --accent-soft:#1F5B74; --accent-ink:#7FD0EA;
+  --warm:#B98228;
+  --good:#4DB392; --warn:#D9A548; --crit:#D9785F;
+  --band:#081120; --band-ink:#EAF0F7; --band-ink-2:#9FB0C6; --band-accent:#5CC3E3;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:1160px;margin:0 auto}
+h1,h2,h3{font-family:var(--serif);text-wrap:balance;margin:0;letter-spacing:-.01em}
+.eyebrow{font-size:11.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+.band{background:var(--band);color:var(--band-ink);margin-inline:-16px;padding-inline:16px;padding-block:28px 26px}
+.band .wrap{display:grid;grid-template-columns:1.4fr 1fr;gap:28px;align-items:end}
+.band .eyebrow{color:var(--band-ink-2)}
+.band h1{font-size:clamp(28px,4vw,40px);line-height:1.12;margin-top:8px}
+.band p{color:var(--band-ink-2);margin:10px 0 0;max-width:60ch}
+.round{border:1px solid rgba(169,183,201,.28);border-radius:10px;padding:16px 18px;display:grid;gap:10px}
+.round .big{font-family:var(--serif);font-size:38px;font-weight:700;line-height:1}
+.terms{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;font-weight:500;padding:3px 9px;border-radius:999px;border:1px solid rgba(92,195,227,.45);color:var(--band-accent)}
+.round dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:13px}
+.round dt{color:var(--band-ink-2)} .round dd{margin:0;text-align:right;font-family:var(--mono)}
+
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:22px}
+.kpi{background:var(--surface);padding:16px 16px 14px;display:grid;gap:4px;align-content:start}
+.kpi .v{font-family:var(--serif);font-size:30px;font-weight:700;line-height:1.05;color:var(--ink)}
+.kpi .l{font-size:13px;color:var(--ink-2)}
+.kpi .s{font-size:12px;color:var(--muted)}
+.scen-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;color:var(--accent-ink);background:color-mix(in srgb,var(--accent) 12%,transparent)}
+
+section{margin-top:34px}
+.sec-head{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.sec-head h2{font-size:24px;margin-top:4px}
+.sec-head p{margin:6px 0 0;color:var(--ink-2);max-width:70ch;font-size:14px}
+.grid{display:grid;gap:16px}
+.g-2-1{grid-template-columns:1.65fr 1fr}
+.g-1-1{grid-template-columns:1fr 1fr}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+.panel h3{font-size:17px}
+.note{font-size:12.5px;color:var(--muted);margin:10px 0 0}
+
+.seg{display:inline-flex;background:var(--surface-2);border-radius:8px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{font:500 13px var(--sans);color:var(--ink-2);background:transparent;border:0;border-radius:6px;padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(15,30,51,.12)}
+.seg button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Scenario controls */
+.controls{display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:20px;align-items:end}
+.controls label{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--ink-2);margin-bottom:6px}
+.controls label output{font-family:var(--mono);color:var(--ink);font-weight:500}
+input[type=range]{width:100%;accent-color:var(--accent)}
+
+svg text{font-family:var(--sans);fill:var(--muted);font-size:12px}
+svg .val{font-family:var(--mono);fill:var(--ink);font-size:13px;font-weight:500}
+svg .yr{fill:var(--ink-2);font-size:13px;font-weight:500}
+svg .inlbl{font-family:var(--mono);fill:#fff;font-size:11.5px}
+.chart{width:100%;height:auto;display:block}
+.bar{transition:opacity .15s}
+
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12.5px;padding:7px 10px;border-radius:6px;line-height:1.4;z-index:10;max-width:250px}
+.tip b{font-family:var(--mono);font-weight:500}
+
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+
+/* Flow */
+.flow{display:grid;gap:10px;margin-top:10px}
+.node{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface-2)}
+.node .t{font-weight:600;font-size:14px}
+.node .d{font-size:12.5px;color:var(--ink-2)}
+.edge{display:flex;align-items:center;gap:10px;padding-left:14px;font-size:12.5px;color:var(--ink-2)}
+.edge::before{content:"";width:2px;height:26px;background:var(--accent);border-radius:1px}
+.edge b{font-family:var(--mono);color:var(--ink);font-weight:500}
+
+/* Tables */
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td.n,th.n{text-align:right;font-family:var(--mono);white-space:nowrap}
+tr.sub td{color:var(--ink-2)}
+tr.sub td:first-child{padding-left:22px}
+tr.total td{font-weight:600;border-top:2px solid var(--ink);border-bottom:0}
+tr.grp td{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;padding-top:16px}
+tr.hl td{background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:7px;vertical-align:0}
+input.cnt{width:58px;font:500 13.5px var(--mono);text-align:right;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)}
+input.cnt:hover{border-color:var(--accent)}
+
+/* Pilot timeline */
+.ptl{position:relative;display:grid;grid-template-columns:repeat(9,1fr);gap:6px;margin-top:18px}
+.ptl::before{content:"";position:absolute;left:4%;right:4%;top:7px;height:2px;background:var(--line)}
+.ms{position:relative;text-align:center;font-size:12px;color:var(--ink-2);padding-top:22px}
+.ms::before{content:"";position:absolute;left:50%;top:0;transform:translateX(-50%);width:16px;height:16px;border-radius:50%;background:var(--surface);border:2px solid var(--accent-soft)}
+.ms.bill::before{background:var(--warm);border-color:var(--warm)}
+.ms.gate::before{background:var(--accent);border-color:var(--accent)}
+.ms .dday{display:block;font-family:var(--mono);font-size:12.5px;color:var(--ink);font-weight:500}
+
+/* Problem tiles */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.tile .v{font-family:var(--serif);font-size:32px;font-weight:700;line-height:1.05}
+.tile .l{font-size:13px;color:var(--ink-2);margin-top:4px}
+.tile.alert .v{color:var(--crit)}
+
+.stack{display:grid}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row .k{color:var(--ink-2);font-size:13.5px}
+.row .v{font-family:var(--mono);font-size:15px;font-weight:500;text-align:right}
+
+.ctrl{display:grid;gap:14px;margin-top:12px}
+.ctrl label{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-2);margin-bottom:6px}
+.ctrl label output{font-family:var(--mono);color:var(--ink);font-weight:500}
+.roi-out{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.roi-out div{background:var(--surface-2);border-radius:8px;padding:12px}
+.roi-out .v{font-family:var(--serif);font-size:26px;font-weight:700;line-height:1.1}
+.roi-out .l{font-size:12px;color:var(--ink-2)}
+
+.moat{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.moat .panel h3{font-size:16px;margin-bottom:6px}
+.moat p{margin:0;font-size:13.5px;color:var(--ink-2)}
+
+footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);display:grid;gap:6px}
+footer p{margin:0;max-width:115ch}
+
+@media (max-width:980px){
+  .kpis{grid-template-columns:repeat(3,1fr)}
+  .moat{grid-template-columns:repeat(2,1fr)}
+  .controls{grid-template-columns:1fr 1fr 1fr}
+  .controls .preset{grid-column:1/-1}
+}
+@media (max-width:820px){
+  .band .wrap,.g-2-1,.g-1-1{grid-template-columns:1fr}
+  .tiles{grid-template-columns:1fr 1fr}
+  .ptl{grid-template-columns:repeat(3,1fr);row-gap:18px}
+  .ptl::before{display:none}
+}
+@media (max-width:520px){
+  .kpis{grid-template-columns:1fr 1fr}
+  .kpis .kpi:last-child{grid-column:1/-1}
+  .controls{grid-template-columns:1fr}
+  .moat,.tiles,.roi-out{grid-template-columns:1fr}
+  .kpi .v{font-size:26px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="band">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">OrthoKinetic Track · Sports investor dashboard · October 2026</div>
+      <h1>Paid pilots convert into recurring annual programs.</h1>
+      <p>Revenue builds from 180-day paid pilots that convert at Day 180 into annual programs at $250K a year for professional clubs and $75K a year for Division I programs. In the base case revenue grows from $0.54M in 2027 to $3.15M in 2029, with 17 annual programs active and $3.6M of contracted ARR entering 2030.</p>
+    </div>
+    <div class="round" aria-label="Round terms">
+      <div class="eyebrow">The round</div>
+      <div class="big">$2.3M</div>
+      <div class="terms"><span class="chip">SAFE</span><span class="chip">$10M cap</span><span class="chip">MFN</span><span class="chip">No discount</span></div>
+      <dl>
+        <dt>Raised to date (pre-seed)</dt><dd>$325,000</dd>
+        <dt>Runway on this round</dt><dd>18 months</dd>
+        <dt>Implied avg. net burn</dt><dd>~$128K / mo</dd>
+        <dt>Status</dt><dd>Open, rolling close</dd>
+      </dl>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="kpis" role="list" aria-live="polite">
+    <div class="kpi" role="listitem"><span class="l">2029 revenue</span><span class="v num" id="k-rev">$3.15M</span><span class="s" id="k-rev-s">from $0.54M in 2027</span></div>
+    <div class="kpi" role="listitem"><span class="l">Contracted ARR entering 2030</span><span class="v num" id="k-arr">$3.6M</span><span class="s" id="k-arr-s">34 annual programs</span></div>
+    <div class="kpi" role="listitem"><span class="l">Annual programs active, 2029</span><span class="v num" id="k-prog">17</span><span class="s" id="k-prog-s">3 pro · 14 Division I</span></div>
+    <div class="kpi" role="listitem"><span class="l">Recurring share of 2029 revenue</span><span class="v num" id="k-rec">57%</span><span class="s">Annual programs over total</span></div>
+    <div class="kpi" role="listitem"><span class="l">Gross margin</span><span class="v">65%+</span><span class="s">Target at scale, COGS build in progress</span></div>
+  </div>
+
+  <section id="model">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Revenue model</div>
+        <h2>Paid pilots plus converted annual programs equals revenue</h2>
+        <p>Every dollar traces to a pilot count, a conversion rate and a renewal rate. Change the scenario or the pilot plan and the whole page recalculates.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="controls">
+        <div class="preset">
+          <label>Scenario <output id="scen-name">Base</output></label>
+          <div class="seg" role="group" aria-label="Scenario">
+            <button type="button" id="sc-cons" data-s="cons" aria-pressed="false">Conservative</button>
+            <button type="button" id="sc-base" data-s="base" aria-pressed="true">Base</button>
+            <button type="button" id="sc-up" data-s="up" aria-pressed="false">Upside</button>
+          </div>
+        </div>
+        <div>
+          <label for="cp">Pro pilot to annual conversion <output id="cp-out">50%</output></label>
+          <input type="range" id="cp" min="0" max="100" step="5" value="50">
+        </div>
+        <div>
+          <label for="cd">Division I pilot to annual conversion <output id="cd-out">75%</output></label>
+          <input type="range" id="cd" min="0" max="100" step="5" value="75">
+        </div>
+        <div>
+          <label for="rt">Annual program renewal <output id="rt-out">90%</output></label>
+          <input type="range" id="rt" min="50" max="100" step="5" value="90">
+        </div>
+      </div>
+    </div>
+
+    <div class="grid g-2-1" style="margin-top:16px">
+      <div class="panel">
+        <h3 id="rev-title">Revenue by year ($K)</h3>
+        <svg class="chart" id="revchart" viewBox="0 0 640 310" role="img" aria-labelledby="rev-title"></svg>
+        <div class="legend"><span><i style="background:var(--accent)"></i>Annual program revenue (recurring)</span><span><i style="background:var(--warm)"></i>Pilot revenue</span></div>
+      </div>
+      <div class="panel">
+        <h3>How a customer moves through the model</h3>
+        <div class="flow">
+          <div class="node"><div class="t">Paid pilot · 180 days</div><div class="d">Pro $150K · Division I $30K. 50% invoiced at signature, 50% at Day 180.</div></div>
+          <div class="edge">Converts at the Day 180 gate: pro <b id="f-cp">50%</b>, Division I <b id="f-cd">75%</b></div>
+          <div class="node"><div class="t">Annual program</div><div class="d">Pro $250K a year · Division I $75K a year. Full roster, hardware refresh included.</div></div>
+          <div class="edge">Renews each year at <b id="f-rt">90%</b></div>
+          <div class="node"><div class="t">Recurring base</div><div class="d">Contracted ARR entering 2030: <b class="num" id="f-arr">$3.6M</b></div></div>
+        </div>
+        <p class="note">Conversions start billing the year after the pilot is signed. A pilot signed in the off-season converts mid-year, so this convention understates recurring revenue in the conversion year.</p>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:16px">
+      <h3>Revenue build</h3>
+      <p class="note" style="margin-top:4px">New pilot counts are editable. All other rows are calculated.</p>
+      <div class="tbl-wrap" style="margin-top:8px">
+        <table id="build">
+          <thead><tr><th>Line</th><th class="n">Unit price</th><th class="n">2027</th><th class="n">2028</th><th class="n">2029</th></tr></thead>
+          <tbody>
+            <tr class="grp"><td colspan="5">Customers</td></tr>
+            <tr><td>New pro pilots</td><td class="n">$150K</td><td class="n"><input class="cnt" id="p0" type="number" min="0" max="30" value="2" aria-label="New pro pilots 2027"></td><td class="n"><input class="cnt" id="p1" type="number" min="0" max="30" value="3" aria-label="New pro pilots 2028"></td><td class="n"><input class="cnt" id="p2" type="number" min="0" max="30" value="5" aria-label="New pro pilots 2029"></td></tr>
+            <tr><td>New Division I pilots</td><td class="n">$30K</td><td class="n"><input class="cnt" id="d0" type="number" min="0" max="100" value="8" aria-label="New Division I pilots 2027"></td><td class="n"><input class="cnt" id="d1" type="number" min="0" max="100" value="12" aria-label="New Division I pilots 2028"></td><td class="n"><input class="cnt" id="d2" type="number" min="0" max="100" value="20" aria-label="New Division I pilots 2029"></td></tr>
+            <tr><td>Pro annual programs active</td><td class="n">$250K</td><td class="n" id="sp0"></td><td class="n" id="sp1"></td><td class="n" id="sp2"></td></tr>
+            <tr><td>Division I annual programs active</td><td class="n">$75K</td><td class="n" id="sd0"></td><td class="n" id="sd1"></td><td class="n" id="sd2"></td></tr>
+            <tr class="grp"><td colspan="5">Revenue ($K)</td></tr>
+            <tr><td><span class="dot" style="background:var(--warm)"></span>Pilot revenue</td><td></td><td class="n" id="pr0"></td><td class="n" id="pr1"></td><td class="n" id="pr2"></td></tr>
+            <tr class="sub"><td>Pro pilots</td><td></td><td class="n" id="ppr0"></td><td class="n" id="ppr1"></td><td class="n" id="ppr2"></td></tr>
+            <tr class="sub"><td>Division I pilots</td><td></td><td class="n" id="dpr0"></td><td class="n" id="dpr1"></td><td class="n" id="dpr2"></td></tr>
+            <tr><td><span class="dot" style="background:var(--accent)"></span>Annual program revenue</td><td></td><td class="n" id="ar0"></td><td class="n" id="ar1"></td><td class="n" id="ar2"></td></tr>
+            <tr class="sub"><td>Pro annual programs</td><td></td><td class="n" id="par0"></td><td class="n" id="par1"></td><td class="n" id="par2"></td></tr>
+            <tr class="sub"><td>Division I annual programs</td><td></td><td class="n" id="dar0"></td><td class="n" id="dar1"></td><td class="n" id="dar2"></td></tr>
+            <tr class="total"><td>Total revenue</td><td></td><td class="n" id="t0"></td><td class="n" id="t1"></td><td class="n" id="t2"></td></tr>
+            <tr class="sub"><td>Growth</td><td></td><td class="n" id="g0">First year</td><td class="n" id="g1"></td><td class="n" id="g2"></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="pilot">
+    <div class="sec-head"><div><div class="eyebrow">The pilot</div><h2>180 days from countersignature to subscription decision</h2></div></div>
+    <div class="panel">
+      <div class="ptl" role="list">
+        <div class="ms bill" role="listitem"><span class="dday">Day 1</span>Agreement signed, first 50% invoiced</div>
+        <div class="ms" role="listitem"><span class="dday">Day 7</span>Kickoff, success criteria locked</div>
+        <div class="ms" role="listitem"><span class="dday">Day 21</span>Deployment, staff run sessions unassisted</div>
+        <div class="ms" role="listitem"><span class="dday">Day 30</span>Baselines complete</div>
+        <div class="ms" role="listitem"><span class="dday">Day 60</span>First outcomes review</div>
+        <div class="ms" role="listitem"><span class="dday">Day 90</span>Mid-pilot checkpoint, subscription talk opens</div>
+        <div class="ms" role="listitem"><span class="dday">Day 135</span>Season-load trend review</div>
+        <div class="ms" role="listitem"><span class="dday">Day 165</span>Data lock, outcomes report</div>
+        <div class="ms bill gate" role="listitem"><span class="dday">Day 180</span>Debrief, second 50% invoiced, subscription decision</div>
+      </div>
+      <div class="legend" style="margin-top:18px"><span><i style="background:var(--warm);border-radius:50%"></i>Invoice point</span><span><i style="background:var(--accent);border-radius:50%"></i>Conversion gate</span></div>
+    </div>
+
+    <div class="panel" style="margin-top:16px">
+      <h3>Price ladder by segment</h3>
+      <div class="tbl-wrap" style="margin-top:6px">
+        <table>
+          <thead><tr><th>Segment</th><th>Pilot</th><th>Annual program</th><th>Cohort and buying logic</th></tr></thead>
+          <tbody>
+            <tr class="hl"><td>Professional / MLB</td><td class="n" style="text-align:left">$150,000</td><td class="n" style="text-align:left">$250,000 / yr</td><td>8 to 12 overhead athletes. Less than one prevented re-injury pays for the year.</td></tr>
+            <tr><td>Collegiate Division I</td><td class="n" style="text-align:left">$25,000 to $37,500</td><td class="n" style="text-align:left">$75,000 / yr</td><td>Usually one sport. Scholarship and season loss drive the case.</td></tr>
+            <tr><td>Collegiate, single sport</td><td class="n" style="text-align:left">$35,000</td><td class="n" style="text-align:left">$75,000 / yr</td><td>One sport or position group, converting after 90 days.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">The model prices Division I pilots at $30K, the planning midpoint of the $25K to $37.5K range.</p>
+    </div>
+  </section>
+
+  <section id="roi">
+    <div class="sec-head"><div><div class="eyebrow">Buyer economics</div><h2>What one prevented re-injury is worth to a club</h2></div></div>
+    <div class="grid g-1-1">
+      <div class="panel">
+        <h3>Buyer ROI calculator</h3>
+        <div class="ctrl">
+          <div>
+            <label>Offer <output id="tier-out"></output></label>
+            <div class="seg" role="group" aria-label="Offer">
+              <button type="button" id="tier-annual" aria-pressed="true" data-p="250000">Annual program</button>
+              <button type="button" id="tier-pilot" aria-pressed="false" data-p="150000">180-day pilot</button>
+            </div>
+          </div>
+          <div>
+            <label for="cost">Cost per re-injury event <output id="cost-out"></output></label>
+            <input type="range" id="cost" min="0.5" max="5" step="0.01" value="1.41">
+          </div>
+          <div>
+            <label for="events">Re-injury events prevented per year <output id="events-out"></output></label>
+            <input type="range" id="events" min="0.5" max="4" step="0.5" value="1">
+          </div>
+        </div>
+        <div class="roi-out">
+          <div><div class="v num" id="o-avoid">$1.41M</div><div class="l">Loss avoided</div></div>
+          <div><div class="v num" id="o-mult">5.6×</div><div class="l">Return on price</div></div>
+          <div><div class="v num" id="o-be">0.18</div><div class="l">Events to break even</div></div>
+        </div>
+        <p class="note">The $1.41M default is the average salary lost per MLB pitcher injured-list placement for shoulder and elbow, 2015 to 2025. OKT pricing material cites $2M to $5M per professional soft-tissue re-injury once rehab and roster impact are counted.</p>
+      </div>
+      <div class="panel">
+        <h3 id="roi-title">Price versus loss avoided</h3>
+        <svg class="chart" id="roichart" viewBox="0 0 520 220" role="img" aria-labelledby="roi-title"></svg>
+        <div class="legend"><span><i style="background:var(--warm)"></i>Program price</span><span><i style="background:var(--accent)"></i>Loss avoided</span></div>
+        <div class="stack" style="margin-top:14px">
+          <div class="row"><span class="k">Pilot as a share of one re-injury</span><span class="v">3% to 7.5%</span></div>
+          <div class="row"><span class="k">Annual program as a share of one re-injury</span><span class="v">5% to 12.5%</span></div>
+          <div class="row"><span class="k">Typical spend on each adjacent tool a club runs</span><span class="v">$8K to $200K+</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="problem">
+    <div class="sec-head"><div><div class="eyebrow">The cost of being wrong</div><h2>One league, one joint group, eleven seasons</h2></div></div>
+    <div class="tiles">
+      <div class="panel tile"><div class="v num">$3.33B</div><div class="l">Salary lost to shoulder and elbow injuries, MLB pitchers, 2015 to 2025</div></div>
+      <div class="panel tile"><div class="v num">$1.06B</div><div class="l">Shoulder share of that total</div></div>
+      <div class="panel tile"><div class="v num">$1.41M</div><div class="l">Average salary lost per injured-list placement</div></div>
+      <div class="panel tile"><div class="v num">1,122</div><div class="l">Pitchers on the injured list; most went back on it again</div></div>
+      <div class="panel tile"><div class="v num">2,365</div><div class="l">Injured-list placements</div></div>
+      <div class="panel tile alert"><div class="v num">171,746</div><div class="l">Days lost on the injured list</div></div>
+    </div>
+  </section>
+
+  <section id="market">
+    <div class="sec-head"><div><div class="eyebrow">Market</div><h2>A $45M annual-program beachhead at list price</h2></div></div>
+    <div class="grid g-2-1">
+      <div class="panel">
+        <h3 id="mkt-title">US overhead-sport organizations × annual program price</h3>
+        <svg class="chart" id="mkt" viewBox="0 0 600 200" role="img" aria-labelledby="mkt-title"></svg>
+        <p class="note">Organization counts from public league rosters and NCAA sport sponsorship data. Each segment is priced at its own annual program list price.</p>
+      </div>
+      <div class="panel">
+        <div class="stack">
+          <div class="row"><span class="k">Beachhead annual-program opportunity</span><span class="v">$45M</span></div>
+          <div class="row"><span class="k">Contracted ARR entering 2030 as a share</span><span class="v" id="m-share">8.0%</span></div>
+          <div class="row"><span class="k">MLB clubs on an annual program, 2029</span><span class="v" id="m-mlb">3 of 30</span></div>
+          <div class="row"><span class="k">Division I programs on an annual program, 2029</span><span class="v" id="m-d1">14 of ~500</span></div>
+          <div class="row"><span class="k">Adjacency: orthopedic rehabilitation</span><span class="v">$8.4B</span></div>
+        </div>
+        <p class="note">Expansion after the beachhead covers every major US league, the full D1 field, private performance facilities and the knee through DORSA.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="moat">
+    <div class="sec-head"><div><div class="eyebrow">Proof and defensibility</div><h2>What a competitor would have to rebuild</h2></div></div>
+    <div class="moat">
+      <div class="panel"><h3>Issued US patent</h3><p>AI shoulder monitoring, allowed August 2026. Coverage in the US, EPO and Canada.</p></div>
+      <div class="panel"><h3>Electrode IP</h3><p>Reusable low-impedance skin interface, joint filing with WPI.</p></div>
+      <div class="panel"><h3>Clinical dataset</h3><p>41 participants across New England Baptist Hospital and UMass Chan Medical School, already collected.</p></div>
+      <div class="panel"><h3>Class I, exempt</h3><p>21 CFR 890.1925. First revenue carries no clearance gate.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Model conventions: pilot revenue is recognized in the year the pilot is signed. Pilots that convert start their annual program the following year. Annual programs renew at the renewal rate each year. Counts are rounded to whole customers at each step and revenue is calculated from those counts. Contracted ARR entering 2030 counts 2029 renewals plus conversions from 2029 pilots at list price.</p>
+    <p>Sources: OKT pricing and value summary; OKT pro pilot timeline and milestone guide; OKT investor deck, September 2026. Injury figures from a retrospective 11-season analysis of shoulder and elbow injuries in MLB pitchers, 2015 to 2025, inflation-adjusted to 2025 USD.</p>
+    <p>Forward-looking figures are projections. Gross margin is a target pending the COGS build. The readiness score is decision support for sports medicine staff and does not diagnose or replace clinical judgment. Implied burn is the round divided by the stated runway.</p>
+  </footer>
+</main>
+
+<div class="tip" id="tip" hidden></div>
+
+<script>
+(function(){
+  const NS="http://www.w3.org/2000/svg";
+  const tip=document.getElementById('tip');
+  const $=id=>document.getElementById(id);
+  function el(tag,attrs,parent,text){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;if(parent)parent.appendChild(e);return e;}
+  function showTip(evt,html){tip.innerHTML=html;tip.hidden=false;moveTip(evt);}
+  function moveTip(evt){const w=tip.offsetWidth;tip.style.left=Math.min(evt.clientX+14,window.innerWidth-w-8)+'px';tip.style.top=(evt.clientY+14)+'px';}
+  function hideTip(){tip.hidden=true;}
+  function hover(node,html){node.addEventListener('mouseenter',e=>showTip(e,typeof html==='function'?html():html));node.addEventListener('mousemove',moveTip);node.addEventListener('mouseleave',hideTip);}
+  const kfmt=v=>'$'+Math.round(v).toLocaleString()+'K';
+  const mfmt=v=>'$'+(v/1000).toFixed(v>=10000?1:2).replace(/0$/,'').replace(/\.$/,'')+'M';
+
+  /* ---------- Revenue model ---------- */
+  const PRICE={pp:150,dp:30,pa:250,da:75};
+  const SCEN={cons:{n:'Conservative',cp:35,cd:50,rt:80},base:{n:'Base',cp:50,cd:75,rt:90},up:{n:'Upside',cp:65,cd:85,rt:95}};
+  const YEARS=[2027,2028,2029];
+  const cp=$('cp'),cd=$('cd'),rt=$('rt');
+  function readCounts(prefix){return [0,1,2].map(i=>{const v=parseInt($(prefix+i).value,10);return isFinite(v)&&v>=0?v:0;});}
+  function model(){
+    const P=readCounts('p'),D=readCounts('d');
+    const c1=cp.value/100,c2=cd.value/100,r=rt.value/100,R=Math.round;
+    const sp=[0],sd=[0];
+    for(let i=1;i<3;i++){sp[i]=R(sp[i-1]*r)+R(P[i-1]*c1);sd[i]=R(sd[i-1]*r)+R(D[i-1]*c2);}
+    const rows=YEARS.map((y,i)=>{const ppr=P[i]*PRICE.pp,dpr=D[i]*PRICE.dp,par=sp[i]*PRICE.pa,dar=sd[i]*PRICE.da;
+      return {y,P:P[i],D:D[i],sp:sp[i],sd:sd[i],ppr,dpr,par,dar,pil:ppr+dpr,sub:par+dar,tot:ppr+dpr+par+dar};});
+    const ep=R(sp[2]*r)+R(P[2]*c1),ed=R(sd[2]*r)+R(D[2]*c2);
+    return {rows,ep,ed,arr:ep*PRICE.pa+ed*PRICE.da};
+  }
+  const svg=$('revchart');
+  function niceMax(v){const steps=[500,1000,2000,2500,5000];for(const s of [1000,1500,2000,2500,3000,4000,5000,6000,8000,10000,15000,20000])if(v*1.12<=s)return s;return Math.ceil(v/5000)*5000;}
+  function drawRev(m){
+    svg.innerHTML='';
+    const T={l:58,r:16,t:28,b:34,W:640,H:310},ih=T.H-T.t-T.b,iw=T.W-T.l-T.r;
+    const mx=niceMax(Math.max(...m.rows.map(r=>r.tot),100));
+    const step=mx<=2000?500:mx<=6000?1000:mx<=10000?2000:5000;
+    const y=v=>T.t+ih-(v/mx)*ih;
+    for(let t=0;t<=mx+1;t+=step){
+      el('line',{x1:T.l,x2:T.W-T.r,y1:y(t),y2:y(t),stroke:t===0?'var(--line)':'var(--grid)','stroke-width':1},svg);
+      el('text',{x:T.l-10,y:y(t)+4,'text-anchor':'end'},svg,t===0?'0':(t>=1000?'$'+(t/1000)+'M':'$'+t+'K'));
+    }
+    const band=iw/3,bw=Math.min(96,band*0.48);
+    m.rows.forEach((r,i)=>{
+      const cx=T.l+band*i+band/2,x=cx-bw/2;
+      const ySub=y(r.sub),hSub=y(0)-ySub;
+      const yTop=y(r.tot),hPil=ySub-yTop;
+      const gap=(r.sub>0&&r.pil>0)?2:0;
+      if(r.sub>0){
+        const rad=r.pil>0?0:4;
+        el('path',{d:`M${x},${y(0)}V${ySub+rad}Q${x},${ySub} ${x+rad},${ySub}H${x+bw-rad}Q${x+bw},${ySub} ${x+bw},${ySub+rad}V${y(0)}Z`,style:'fill:var(--accent)',class:'bar'},svg);
+        if(hSub>22)el('text',{x:cx,y:ySub+16,'text-anchor':'middle',class:'inlbl'},svg,kfmt(r.sub));
+      }
+      if(r.pil>0){
+        const top=yTop,bot=ySub-gap,h=Math.max(bot-top,1),rad=Math.min(4,h);
+        el('path',{d:`M${x},${bot}V${top+rad}Q${x},${top} ${x+rad},${top}H${x+bw-rad}Q${x+bw},${top} ${x+bw},${top+rad}V${bot}Z`,style:'fill:var(--warm)',class:'bar'},svg);
+        if(h>22)el('text',{x:cx,y:top+16,'text-anchor':'middle',class:'inlbl'},svg,kfmt(r.pil));
+      }
+      el('text',{x:cx,y:yTop-9,'text-anchor':'middle',class:'val'},svg,r.tot>=1000?mfmt(r.tot):kfmt(r.tot));
+      el('text',{x:cx,y:T.H-10,'text-anchor':'middle',class:'yr'},svg,String(r.y));
+      const hit=el('rect',{x:cx-band/2+6,y:T.t,width:band-12,height:ih,fill:'transparent'},svg);
+      hover(hit,`<b>${r.y}</b> · total <b>${kfmt(r.tot)}</b><br>Annual programs <b>${kfmt(r.sub)}</b> (${r.sp} pro, ${r.sd} D1)<br>Pilots <b>${kfmt(r.pil)}</b> (${r.P} pro, ${r.D} D1)`);
+    });
+  }
+  function render(){
+    $('cp-out').textContent=cp.value+'%';$('cd-out').textContent=cd.value+'%';$('rt-out').textContent=rt.value+'%';
+    $('f-cp').textContent=cp.value+'%';$('f-cd').textContent=cd.value+'%';$('f-rt').textContent=rt.value+'%';
+    const m=model(),R=m.rows;
+    R.forEach((r,i)=>{
+      $('sp'+i).textContent=r.sp;$('sd'+i).textContent=r.sd;
+      $('pr'+i).textContent=kfmt(r.pil);$('ppr'+i).textContent=kfmt(r.ppr);$('dpr'+i).textContent=kfmt(r.dpr);
+      $('ar'+i).textContent=kfmt(r.sub);$('par'+i).textContent=kfmt(r.par);$('dar'+i).textContent=kfmt(r.dar);
+      $('t'+i).textContent=kfmt(r.tot);
+      if(i>0)$('g'+i).textContent=R[i-1].tot>0?(r.tot/R[i-1].tot).toFixed(1)+'×':'n/a';
+    });
+    const last=R[2];
+    $('k-rev').textContent=mfmt(last.tot);
+    $('k-rev-s').textContent='from '+mfmt(R[0].tot)+' in 2027, '+mfmt(R[1].tot)+' in 2028';
+    $('k-arr').textContent=mfmt(m.arr);
+    $('k-arr-s').textContent=(m.ep+m.ed)+' annual programs ('+m.ep+' pro, '+m.ed+' D1)';
+    $('k-prog').textContent=last.sp+last.sd;
+    $('k-prog-s').textContent=last.sp+' pro · '+last.sd+' Division I';
+    $('k-rec').textContent=last.tot>0?Math.round(last.sub/last.tot*100)+'%':'0%';
+    $('f-arr').textContent=mfmt(m.arr);
+    $('m-share').textContent=(m.arr/45000*100).toFixed(1)+'%';
+    $('m-mlb').textContent=last.sp+' of 30';
+    $('m-d1').textContent=last.sd+' of ~500';
+    drawRev(m);
+  }
+  function setScenario(key){
+    const s=SCEN[key];cp.value=s.cp;cd.value=s.cd;rt.value=s.rt;$('scen-name').textContent=s.n;
+    document.querySelectorAll('#model .seg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.s===key)));
+    render();
+  }
+  document.querySelectorAll('#model .seg button').forEach(b=>b.addEventListener('click',()=>setScenario(b.dataset.s)));
+  [cp,cd,rt].forEach(inp=>inp.addEventListener('input',()=>{
+    let match=null;for(const k in SCEN){const s=SCEN[k];if(+cp.value===s.cp&&+cd.value===s.cd&&+rt.value===s.rt)match=k;}
+    $('scen-name').textContent=match?SCEN[match].n:'Custom';
+    document.querySelectorAll('#model .seg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.s===match)));
+    render();
+  }));
+  document.querySelectorAll('input.cnt').forEach(inp=>inp.addEventListener('input',render));
+  render();
+
+  /* ---------- ROI ---------- */
+  let price=250000;
+  const cost=$('cost'),events=$('events'),roiSvg=$('roichart');
+  const money=v=>v>=1e6?'$'+(v/1e6).toFixed(2).replace(/\.?0+$/,'')+'M':'$'+Math.round(v/1000)+'K';
+  function drawRoi(){
+    const c=parseFloat(cost.value)*1e6,n=parseFloat(events.value),avoid=c*n;
+    $('tier-out').textContent=money(price);$('cost-out').textContent=money(c);$('events-out').textContent=n.toFixed(1);
+    $('o-avoid').textContent=money(avoid);$('o-mult').textContent=(avoid/price).toFixed(1)+'×';$('o-be').textContent=(price/c).toFixed(2);
+    roiSvg.innerHTML='';
+    const L=118,Rr=20,W=520;let mx=avoid<=5e6?5e6:avoid<=10e6?10e6:20e6;
+    const x=v=>L+(v/mx)*(W-L-Rr);const st=mx/4;
+    for(let t=0;t<=mx;t+=st){el('line',{x1:x(t),x2:x(t),y1:18,y2:176,stroke:t===0?'var(--line)':'var(--grid)'},roiSvg);el('text',{x:x(t),y:196,'text-anchor':'middle'},roiSvg,t===0?'0':'$'+(t/1e6)+'M');}
+    [{k:'Program price',v:price,c:'var(--warm)',y:40},{k:'Loss avoided',v:avoid,c:'var(--accent)',y:108}].forEach(r=>{
+      const w=Math.max(x(r.v)-L,3);
+      el('text',{x:L-10,y:r.y+26,'text-anchor':'end',class:'yr'},roiSvg,r.k);
+      const b=el('path',{d:`M${L},${r.y}H${L+w-4}Q${L+w},${r.y} ${L+w},${r.y+4}V${r.y+40}Q${L+w},${r.y+44} ${L+w-4},${r.y+44}H${L}Z`,style:`fill:${r.c}`,class:'bar'},roiSvg);
+      const inside=L+w+8>W-70;
+      el('text',{x:inside?L+w-8:L+w+8,y:r.y+27,'text-anchor':inside?'end':'start',class:inside?'inlbl':'val'},roiSvg,money(r.v));
+      hover(b,`${r.k}: <b>${money(r.v)}</b>`);
+    });
+  }
+  document.querySelectorAll('#roi .seg button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#roi .seg button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));price=+b.dataset.p;drawRoi();}));
+  cost.addEventListener('input',drawRoi);events.addEventListener('input',drawRoi);
+  drawRoi();
+
+  /* ---------- Market ---------- */
+  const mkt=$('mkt');
+  const segs=[{k:'D1 baseball',n:'~300',p:'$75K',v:22.5},{k:'D1 swim & volleyball',n:'~200',p:'$75K',v:15},{k:'MLB clubs',n:'30',p:'$250K',v:7.5}];
+  const L2=150,R2=70,W2=600,mx2=25,x2=v=>L2+(v/mx2)*(W2-L2-R2);
+  [0,5,10,15,20,25].forEach(t=>{el('line',{x1:x2(t),x2:x2(t),y1:10,y2:162,stroke:t===0?'var(--line)':'var(--grid)'},mkt);el('text',{x:x2(t),y:182,'text-anchor':'middle'},mkt,t===0?'0':'$'+t+'M');});
+  segs.forEach((s,i)=>{
+    const y=18+i*48,w=x2(s.v)-L2;
+    el('text',{x:L2-10,y:y+14,'text-anchor':'end',class:'yr'},mkt,s.k);
+    el('text',{x:L2-10,y:y+30,'text-anchor':'end'},mkt,s.n+' orgs × '+s.p);
+    const b=el('path',{d:`M${L2},${y}H${L2+w-4}Q${L2+w},${y} ${L2+w},${y+4}V${y+30}Q${L2+w},${y+34} ${L2+w-4},${y+34}H${L2}Z`,style:'fill:var(--accent)',class:'bar'},mkt);
+    el('text',{x:L2+w+8,y:y+22,class:'val'},mkt,'$'+s.v+'M');
+    hover(b,`${s.k}: <b>${s.n}</b> orgs × <b>${s.p}</b> = <b>$${s.v}M</b>`);
+  });
+})();
+</script>
+
+</body>
+</html>
